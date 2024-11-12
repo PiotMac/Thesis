@@ -37,38 +37,72 @@ db.connect((err) => {
   console.log("Connected to MySQL Database");
 });
 
+// Start the Server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
 // Login Endpoint
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const sql = "SELECT user_id, password FROM Users WHERE email = ?";
-  db.query(sql, [email], async (err, rows) => {
-    if (err) {
-      return res.status(500).json({ message: "Database error", err });
+  // First check if the user is an admin
+  const sql_admin = "SELECT user_id, password FROM Admins WHERE email = ?";
+
+  // Then check if it is a common user
+  const sql_user = "SELECT user_id, password FROM Users WHERE email = ?";
+
+  const checkUser = (sql) =>
+    new Promise((resolve, reject) => {
+      db.query(sql, [email], async (err, rows) => {
+        if (err) return reject({ status: 500, message: "Database error", err });
+        if (rows.length === 0) return resolve(null); // User not found in current table
+        resolve(rows[0]); // Return the user data if found
+      });
+    });
+
+  try {
+    let user = await checkUser(sql_admin); // Check admin table first
+    let userType = "admin";
+    if (!user) {
+      // If not admin, check regular Users table
+      user = await checkUser(sql_user);
+      userType = "user";
     }
 
-    if (rows.length === 0) {
+    if (!user) {
+      // User not found in either table
       return res.status(404).json({ message: "User not found" });
     }
 
-    const userId = rows[0].id;
-    const hashedPassword = rows[0].password;
+    console.log(password);
+    console.log(user.password);
 
-    const isPasswordValid = await bcrypt.compare(password, hashedPassword);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: "30m" });
+
+    const token = jwt.sign(
+      { userId: user.user_id, email, role: userType },
+      JWT_SECRET,
+      { expiresIn: "30m" }
+    );
 
     return res.status(200).json({ message: "Login successful", token });
-  });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    return res
+      .status(error.status || 500)
+      .json({ message: error.message || "Error occurred", error });
+  }
 });
 
 app.get("/profile", authenticateToken, (req, res) => {
   const email = req.user.email;
   db.query("SELECT * FROM Users WHERE email = ?", [email], (err, result) => {
     if (err) return res.status(500).send("Error fetching profile");
-    console.log(result[0]);
     res.json(result[0]);
   });
 });
@@ -100,8 +134,13 @@ app.post("/register", async (req, res) => {
         console.error("Error registering user:", err);
         return res.status(500).send("Error registering user");
       }
-      res.status(201).send("User registered successfully");
     });
+    const token = jwt.sign({ email, role: "user" }, JWT_SECRET, {
+      expiresIn: "30m",
+    });
+    return res
+      .status(201)
+      .json({ message: "User registered successfully", token });
   } catch (error) {
     console.error("Error hashing password:", error);
     res.status(500).send("Error registering user");
@@ -113,7 +152,22 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-// Start the Server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// Endpoint to get products by main category and subcategory
+// app.get("/:mainCategory/:subcategory", (req, res) => {
+//   const { mainCategory, subcategory } = req.params;
+
+//   // Sample query to fetch products based on mainCategory and subcategory
+//   const query = `
+//     SELECT * FROM products
+//     WHERE category = ? AND subcategory = ?
+//   `;
+
+//   db.query(query, [mainCategory, subcategory], (err, results) => {
+//     if (err) {
+//       console.error("Database query error:", err);
+//       res.status(500).json({ error: "Database error" });
+//       return;
+//     }
+//     res.json(results);
+//   });
+// });
