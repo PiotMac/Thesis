@@ -24,7 +24,7 @@ code {
 
 .main_page {
   display: flex;
-  flex-direction: column; /* Ensure column layout */
+  flex-direction: column;
   min-height: 100vh;
   width: 100vw;
 }
@@ -48,6 +48,8 @@ header {
 }
 
 .categories {
+  display: flex;
+  flex-direction: column;
   background-color: var(--secondary-background-color);
   flex: 1;
   justify-content: center;
@@ -178,8 +180,10 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 65vh;
+  height: fit-content;
   background-color: var(--secondary-background-color);
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .login-form, .register-form {
@@ -273,28 +277,34 @@ footer {
   size: 100px;
 }
 
-.user-profile {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.profile-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
   background-color: var(--primary-color);
+  height: calc(100% - 30px);
+  width: calc(100% - 30px);
+  margin: 10px;
+  box-sizing: border-box;
   border-radius: 8px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 320px;
 }
 
-.user-profile h2 {
+.profile-container h2 {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  color: var(--text-color);
+  font-size: 60px;
+  margin: 0;
+}
+
+.profile-container label {
   color: var(--text-color);
 }
 
-.user-profile label {
-  color: var(--text-color);
-}
-
-.user-profile input {
-  width: 300px;
+.profile-container input {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -303,4 +313,33 @@ footer {
   background-color: #f9f9f9;
   outline: none;
   transition: all 0.3s ease;
+}
+
+.profile-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--navbar-color);
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.profile-container button:hover {
+  background-color: red;
+}
+
+.profile-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-input-group label {
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-size: 30px;
+  font-weight: bold;
+  color: var(--text-color);
 }

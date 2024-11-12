@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
-const RegisterForm = () => {
+const RegisterForm = ({ setIsLoggedIn }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,6 +14,7 @@ const RegisterForm = () => {
     number: false,
     specialChar: false,
   });
+  const navigate = useNavigate();
 
   const handlePasswordCriteria = (e) => {
     const value = e.target.value;
@@ -61,8 +62,10 @@ const RegisterForm = () => {
       });
 
       if (response.ok) {
-        console.log("User registered successfully");
-        // Optionally, redirect the user or reset the form
+        const data = await response.json();
+        localStorage.setItem("token", data.token);
+        setIsLoggedIn(true);
+        navigate("/profile");
       } else {
         setErrorMessage("Registration failed");
       }

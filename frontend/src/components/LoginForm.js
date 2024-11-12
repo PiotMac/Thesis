@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const LoginForm = ({ setIsLoggedIn }) => {
-  console.log("setIsLoggedIn is:", setIsLoggedIn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -22,8 +22,15 @@ const LoginForm = ({ setIsLoggedIn }) => {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem("token", data.token);
+        const decodedToken = jwtDecode(data.token);
+        const userRole = decodedToken.role; // either 'admin' or 'user'
+        localStorage.setItem("role", userRole);
         setIsLoggedIn(true);
-        navigate("/profile");
+        if (userRole === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/profile");
+        }
       } else {
         setErrorMessage("Login failed");
       }

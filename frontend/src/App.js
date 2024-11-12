@@ -9,6 +9,7 @@ import Kids from "./components/Kids";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UserProfile from "./components/UserProfile";
+import CategoryPage from "./components/CategoryPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,14 +43,21 @@ function App() {
           <div className="categories">
             <Routes>
               <Route exact path="/" element={<Women />} />
-              <Route path="/men" element={<Men />} />
-              <Route path="/kids" element={<Kids />} />
+              <Route exact path="/men" element={<Men />} />
+              <Route exact path="/kids" element={<Kids />} />
               <Route
                 path="/login"
                 element={<Login setIsLoggedIn={setIsLoggedIn} />}
               />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/register"
+                element={<Register setIsLoggedIn={setIsLoggedIn} />}
+              />
               <Route path="/profile" element={<UserProfile />} />
+              <Route
+                path="/:mainCategory/:subcategory"
+                element={<CategoryPage />}
+              />
             </Routes>
           </div>
           <Footer />

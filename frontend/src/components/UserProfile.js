@@ -60,11 +60,11 @@ function UserProfile() {
   };
 
   return (
-    <div className="user-profile">
+    <div className="profile-container">
       <h2>Profil użytkownika</h2>
 
-      <label>
-        Imię:
+      <div className="profile-input-group">
+        <label>Imię:</label>
         <input
           type="text"
           name="firstName"
@@ -72,10 +72,10 @@ function UserProfile() {
           onChange={handleInputChange}
           disabled={!isEditing}
         />
-      </label>
+      </div>
 
-      <label>
-        Nazwisko:
+      <div className="profile-input-group">
+        <label>Nazwisko:</label>
         <input
           type="text"
           name="lastName"
@@ -83,10 +83,10 @@ function UserProfile() {
           onChange={handleInputChange}
           disabled={!isEditing}
         />
-      </label>
+      </div>
 
-      <label>
-        Hasło:
+      <div className="profile-input-group">
+        <label>Hasło:</label>
         <input
           type="password"
           name="password"
@@ -94,10 +94,10 @@ function UserProfile() {
           onChange={handleInputChange}
           disabled={!isEditing}
         />
-      </label>
+      </div>
 
-      <label>
-        Numer Telefonu:
+      <div className="profile-input-group">
+        <label>Numer Telefonu:</label>
         <input
           type="tel"
           name="phone"
@@ -105,10 +105,10 @@ function UserProfile() {
           onChange={handleInputChange}
           disabled={!isEditing}
         />
-      </label>
+      </div>
 
-      <label>
-        Adres:
+      <div className="profile-input-group">
+        <label>Adres:</label>
         <input
           type="text"
           name="address"
@@ -116,7 +116,7 @@ function UserProfile() {
           onChange={handleInputChange}
           disabled={!isEditing}
         />
-      </label>
+      </div>
 
       {!isEditing ? (
         <button onClick={() => setIsEditing(true)}>Edytuj</button>
