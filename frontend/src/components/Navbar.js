@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
@@ -41,7 +43,15 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
       </ul>
       <ul id="right-nav">
         <li>
-          <NavLink to="/cart">Koszyk</NavLink>
+          <NavLink to="/cart">
+            <IconButton
+              id="shopping_cart"
+              sx={{ color: "#8E05C2" }}
+              aria-label="add to shopping cart"
+            >
+              <AddShoppingCartIcon />
+            </IconButton>
+          </NavLink>
         </li>
         {isLoggedIn ? (
           <>

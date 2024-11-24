@@ -8,32 +8,32 @@ const Women = () => {
         <CategorySquare
           imageSrc="/shoe.png"
           text="Obuwie"
-          link="/women/shoes"
+          link="/damskie/obuwie"
         />
         <CategorySquare
           imageSrc="/women_bag.png"
           text="Torebki"
-          link="/women/bags"
+          link="/damskie/torebki"
         />
         <CategorySquare
           imageSrc="/trousers.png"
           text="Spodnie"
-          link="/women/trousers"
+          link="/damskie/spodnie"
         />
         <CategorySquare
           imageSrc="/dress.png"
           text="Sukienki"
-          link="/women/dresses"
+          link="/damskie/sukienki"
         />
         <CategorySquare
           imageSrc="/shirt.png"
           text="Koszulki"
-          link="/women/shirts"
+          link="/damskie/koszulki"
         />
         <CategorySquare
           imageSrc="/jacket.png"
           text="Kurtki"
-          link="/women/jackets"
+          link="/damskie/kurtki"
         />
       </div>
     </div>

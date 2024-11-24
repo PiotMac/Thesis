@@ -152,22 +152,36 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-// Endpoint to get products by main category and subcategory
-// app.get("/:mainCategory/:subcategory", (req, res) => {
-//   const { mainCategory, subcategory } = req.params;
+// Endpoint to get subcategories list
+app.get("/:mainCategory/:subcategory", (req, res) => {
+  const { mainCategory, subcategory } = req.params;
 
-//   // Sample query to fetch products based on mainCategory and subcategory
-//   const query = `
-//     SELECT * FROM products
-//     WHERE category = ? AND subcategory = ?
-//   `;
+  let wrappedCategory = "";
+  switch (mainCategory) {
+    case "damskie":
+      wrappedCategory = "Women";
+      break;
+    case "meskie":
+      wrappedCategory = "Men";
+      break;
+    case "dzieciece":
+      wrappedCategory = "Kids";
+      break;
+    default:
+      res.status(500).send("Error fetching category!");
+  }
 
-//   db.query(query, [mainCategory, subcategory], (err, results) => {
-//     if (err) {
-//       console.error("Database query error:", err);
-//       res.status(500).json({ error: "Database error" });
-//       return;
-//     }
-//     res.json(results);
-//   });
-// });
+  const query = `SELECT S.name
+  FROM Subcategories S
+  JOIN Categories C ON S.category_id = C.category_id
+  WHERE C.name = ? AND C.section = ?`;
+
+  db.query(query, [subcategory, wrappedCategory], (err, results) => {
+    if (err) {
+      console.error("Database query error:", err);
+      res.status(500).json({ error: "Database error" });
+      return;
+    }
+    res.json(results);
+  });
+});

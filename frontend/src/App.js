@@ -55,7 +55,7 @@ function App() {
               />
               <Route path="/profile" element={<UserProfile />} />
               <Route
-                path="/:mainCategory/:subcategory"
+                path="/:mainCategory/:subcategory/:subsubcategory?"
                 element={<CategoryPage />}
               />
             </Routes>

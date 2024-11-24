@@ -53,10 +53,10 @@ header {
   background-color: var(--secondary-background-color);
   flex: 1;
   justify-content: center;
-  align-items: center;
   height: 100%;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 .categories_grid {
@@ -85,6 +85,7 @@ header {
 
 .category-square:hover {
   transform: scale(1.05);
+  cursor: pointer;
 }
 
 .square-image {
@@ -136,15 +137,18 @@ nav #right-nav {
 nav li {
   margin-left: 8px;
   margin-right: 8px;
+  align-content: center;
 }
 
 nav ul li a {
   color: white;
   text-decoration: none;
+  font-size: 18px;
 }
 
 nav ul li a:hover {
   font-weight: bold;
+  cursor: pointer;
 }
 
 .active-link {
@@ -251,6 +255,7 @@ footer {
 
 .login-button:hover, .register-button:hover {
   background-color: red;
+  cursor: pointer;
 }
 
 #register_in_log {
@@ -262,6 +267,7 @@ footer {
 #register_in_log:hover {
   font-weight: bold;
   border-bottom: 2px solid var(--text-color);
+  cursor: pointer;
 }
 
 .password-criteria {
@@ -329,6 +335,7 @@ footer {
 
 .profile-container button:hover {
   background-color: red;
+  cursor: pointer;
 }
 
 .profile-input-group {
@@ -342,4 +349,114 @@ footer {
   font-size: 30px;
   font-weight: bold;
   color: var(--text-color);
+}
+
+.container_page {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar filters"
+    "sidebar products";
+  grid-template-columns: 250px 1fr; /* Sidebar is fixed, content expands */
+  grid-template-rows: auto auto 1fr; /* Header and filters take natural height, products fill remaining space */
+  height: 100vh; /* Full-page height */
+  width: 100vw;
+  gap: 20px; /* Spacing between grid items */
+  padding: 20px;
+}
+
+.category_page_header_container {
+  grid-area: header;
+  /* text-align: left; */
+  /* position: absolute; */
+  /* top: 0; Align to the top of the parent */
+  /* left: 0; /* Align to the left of the parent */
+  /* margin: 20px; /* Optional: Add padding from the edges */
+  text-align: left; /* Ensure text aligns left */
+  margin-left: 20px;
+}
+
+.category_page_header {
+  color: var(--text-color);
+}
+
+.subcategories_nav_container {
+  /* text-align: left;
+  position: absolute;
+  left: 0; */
+  grid-area: sidebar;
+  background-color: var(--navbar-color);
+  padding: 20px;
+  border-radius: 8px;
+  margin-left: 20px;
+  height: fit-content;
+}
+
+.subcategories_nav h1 {
+  color: var(--background-color);
+}
+
+.subcategories_list {
+  margin: 0px;
+  padding: 0px;
+}
+
+.subcategories_list li {
+  list-style: none;
+  padding: 15px;
+}
+
+.subcategories_list li a {
+  color: var(--text-color);
+  font-size: large;
+  text-decoration: none;
+}
+
+.subcategories_list li:hover {
+  background-color: red;
+  cursor: pointer;
+  border: 2px solid #000000;
+}
+
+.filters_container {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+#sort_button {
+  background-color: orangered;
+}
+
+.filter {
+  margin: 15px;
+  background-color: var(--navbar-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  height: min-content;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  font-size: 20px;
+  padding: 10px;
+  flex: 1 1 calc(16.66% - 30px);
+}
+
+.filter:hover {
+  background-color: red;
+  cursor: pointer;
+}
+
+#sort_button:hover {
+  background-color: green;
+  cursor: pointer;
+}
+
+.app {
+  display: flex;;
+  justify-content: center;
 }
