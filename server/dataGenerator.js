@@ -78,6 +78,31 @@ async function getSubcategories(category_id) {
   });
 }
 
+async function insertProduct(
+  subcategory_id,
+  brand,
+  name,
+  price,
+  material,
+  description
+) {
+  return new Promise((resolve, reject) => {
+    const query = `
+      INSERT INTO Products (subcategory_id, brand, name, price, material, description)
+      VALUES (?, ?, ?, ?, ?, ?)`;
+    db.query(
+      query,
+      [subcategory_id, brand, name, price, material, description],
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(result);
+      }
+    );
+  });
+}
+
 async function generateProducts() {
   let categories;
   let subcategories;
@@ -96,7 +121,7 @@ async function generateProducts() {
     return; // Exit if there's an error with categories
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 1000; i++) {
     // Choosing random category
     const category_id = Math.floor(Math.random() * categories.length + 1);
     let subcategory_id;
@@ -128,14 +153,7 @@ async function generateProducts() {
     // Choosing random description
     const description = faker.commerce.productDescription();
 
-    console.log("PRODUCT #", i + 1);
-    console.log("Category: ", category_id);
-    console.log("Subcategory: ", subcategory_id);
-    console.log("Brand: ", brand);
-    console.log("Name: ", name);
-    console.log("Price: ", price);
-    console.log("Material: ", material);
-    console.log("Description: ", description);
+    insertProduct(subcategory_id, brand, name, price, material, description);
   }
   db.end();
 }

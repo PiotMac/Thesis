@@ -3,10 +3,12 @@ import { NavLink, useParams, useNavigate } from "react-router-dom";
 import FilterList from "./FilterList";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
+import ProductSquare from "./ProductSquare";
 
 const CategoryPage = () => {
   const { mainCategory, subcategory, subsubcategory } = useParams();
   const [products, setProducts] = useState([]);
+  const [originalProducts, setOriginalProducts] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const navigate = useNavigate();
 
@@ -15,15 +17,25 @@ const CategoryPage = () => {
       try {
         let url = `http://localhost:4000/${mainCategory}/${subcategory}`;
         if (subsubcategory) {
-          console.log(url);
           url += `/${subsubcategory}`;
+          console.log(url);
         }
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to fetch subcategories");
         }
         const data = await response.json();
-        setSubcategories(data.map((item) => item.name));
+        setSubcategories(data.subcategories.map((item) => item.name));
+        const productsData = data.products.map((item) => ({
+          brand: item.brand,
+          name: item.name,
+          price: item.price,
+          material: item.material,
+          description: item.description,
+        }));
+
+        setProducts(productsData);
+        setOriginalProducts(productsData);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
       }
@@ -38,16 +50,23 @@ const CategoryPage = () => {
           {mainCategory.charAt(0).toUpperCase() + mainCategory.slice(1)}{" "}
           {subcategory}
         </h1>
-        {/* <div className="products-grid">
-        {products.map((product) => (
-          <div key={product.id} className="product-card">
-            <img src={product.image} alt={product.name} />
-            <h3>{product.name}</h3>
-            <p>{product.price}</p>
-          </div>
+        <FilterList
+          products={products}
+          setProducts={setProducts}
+          originalProducts={originalProducts}
+        />
+      </div>
+      <div className="products_container">
+        {products.map((product, index) => (
+          <ProductSquare
+            key={index}
+            brand={product.brand}
+            name={product.name}
+            price={product.price}
+            material={product.material}
+            description={product.description}
+          />
         ))}
-      </div> */}
-        <FilterList />
       </div>
       <div className="subcategories_nav_container">
         <div className="subcategories_nav">
@@ -60,7 +79,10 @@ const CategoryPage = () => {
                   navigate(`/${mainCategory}/${subcategory}/${name}`)
                 }
               >
-                <NavLink to={`${mainCategory}/${subcategory}/${name}`}>
+                <NavLink
+                  to={`${mainCategory}/${subcategory}/${name}`}
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
                   {name.charAt(0).toUpperCase() + name.slice(1)}
                 </NavLink>
               </li>

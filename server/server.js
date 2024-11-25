@@ -152,9 +152,9 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
-// Endpoint to get subcategories list
-app.get("/:mainCategory/:subcategory", (req, res) => {
-  const { mainCategory, subcategory } = req.params;
+// Endpoint to render main page with products
+app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
+  const { mainCategory, subcategory, subsubcategory } = req.params;
 
   let wrappedCategory = "";
   switch (mainCategory) {
@@ -171,7 +171,8 @@ app.get("/:mainCategory/:subcategory", (req, res) => {
       res.status(500).send("Error fetching category!");
   }
 
-  const query = `SELECT S.name
+  // Get all the subcategories for the page
+  const query = `SELECT S.subcategory_id, S.name
   FROM Subcategories S
   JOIN Categories C ON S.category_id = C.category_id
   WHERE C.name = ? AND C.section = ?`;
@@ -182,6 +183,69 @@ app.get("/:mainCategory/:subcategory", (req, res) => {
       res.status(500).json({ error: "Database error" });
       return;
     }
-    res.json(results);
+    // Querying products
+    // 1. Subsection is specified
+    let query_get_products;
+    if (subsubcategory) {
+      const get_category_id = `SELECT category_id FROM Categories WHERE name = ? AND section = ?`;
+      db.query(
+        get_category_id,
+        [subcategory, wrappedCategory],
+        (err, cat_id) => {
+          if (err) {
+            console.error("Database query error:", err);
+            return res.status(500).json({ error: "CategoryID not found!" });
+          }
+          console.log(cat_id[0].category_id);
+          const get_subcategory_id = `SELECT subcategory_id FROM Subcategories WHERE name = ? AND category_id = ?`;
+          db.query(
+            get_subcategory_id,
+            [subsubcategory, cat_id[0].category_id],
+            (err, sub_id) => {
+              if (err) {
+                console.error("Database query error:", err);
+                return res
+                  .status(500)
+                  .json({ error: "SubcategoryID not found!" });
+              }
+              console.log(subsubcategory);
+              console.log(sub_id[0].subcategory_id);
+              query_get_products = `SELECT brand, name, price, material, description FROM Products WHERE subcategory_id = ?`;
+              db.query(
+                query_get_products,
+                [sub_id[0].subcategory_id],
+                (err, products) => {
+                  if (err) {
+                    console.error("Database query error:", err);
+                    return res.status(500).json({ error: "Database error" });
+                  }
+
+                  res.json({
+                    subcategories: results,
+                    products: products || [],
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+      // 2. Subsection is NOT specified
+    } else {
+      const subcategoryIds = results.map((row) => row.subcategory_id);
+      query_get_products = `SELECT brand, name, price, material, description FROM Products WHERE subcategory_id IN (?);`;
+      db.query(query_get_products, [subcategoryIds], (err, products) => {
+        if (err) {
+          console.error("Database query error:", err);
+          return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json({
+          subcategories: results,
+          products: products || [],
+          subcategoryIds: subcategoryIds,
+        });
+      });
+    }
   });
 });
