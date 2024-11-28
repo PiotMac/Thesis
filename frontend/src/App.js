@@ -10,6 +10,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import UserProfile from "./components/UserProfile";
 import CategoryPage from "./components/CategoryPage";
+import ProductPage from "./components/ProductPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -58,6 +59,7 @@ function App() {
                 path="/:mainCategory/:subcategory/:subsubcategory?"
                 element={<CategoryPage />}
               />
+              <Route path="/products/:product_id" element={<ProductPage />} />
             </Routes>
           </div>
           <Footer />

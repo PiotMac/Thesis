@@ -152,6 +152,61 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
+app.get("/products/:product_id", (req, res) => {
+  const { product_id } = req.params;
+  const query = `SELECT p.product_id, 
+  p.name, 
+  p.price, 
+  p.material, 
+  p.description, 
+  p.brand, 
+  JSON_ARRAYAGG(
+    JSON_OBJECT(
+        'size', s.name,
+        'color', JSON_OBJECT('red', c.red, 'green', c.green, 'blue', c.blue),
+        'quantity', i.quantity
+    )
+) AS available_variations
+FROM 
+Products p
+JOIN 
+Inventory i ON p.product_id = i.product_id
+JOIN 
+Sizes s ON i.size_id = s.size_id
+JOIN 
+Colors c ON i.color_id = c.color_id
+WHERE 
+p.product_id = ?;`;
+
+  db.query(query, [product_id], (err, product) => {
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+
+    if (product.length === 0) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Extract the product data from the query result
+    const productData = product[0];
+
+    // Parse available variations (it's a JSON string from MySQL)
+    // const availableVariations = JSON.parse(productData.available_variations);
+
+    // Return the product data along with its available variations
+    res.json({
+      product_id: productData.product_id,
+      name: productData.name,
+      price: productData.price,
+      material: productData.material,
+      description: productData.description,
+      brand: productData.brand,
+      available_variations: JSON.parse(productData.available_variations),
+    });
+  });
+});
+
 // Endpoint to render main page with products
 app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
   const { mainCategory, subcategory, subsubcategory } = req.params;

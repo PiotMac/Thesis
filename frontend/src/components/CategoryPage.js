@@ -41,6 +41,7 @@ const CategoryPage = () => {
         const data = await response.json();
         setSubcategories(data.subcategories.map((item) => item.name));
         const productsData = data.products.map((item) => ({
+          product_id: item.product_id,
           brand: item.brand,
           name: item.name,
           price: item.price,
@@ -84,6 +85,7 @@ const CategoryPage = () => {
         {products.map((product, index) => (
           <ProductSquare
             key={index}
+            product_id={product.product_id}
             brand={product.brand}
             name={product.name}
             price={product.price}
