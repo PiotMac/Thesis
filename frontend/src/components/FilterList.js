@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Slider,
@@ -21,7 +21,6 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
   });
 
   const filters = ["Rozmiar", "Cena", "Marka", "Kolor", "Materiał"];
-  const filter_values_for_db = ["price", "brand", "material"];
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("");
@@ -32,14 +31,18 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
 
   const [filterData, setFilterData] = useState({
     materials: [],
-    prices: [],
     brands: [],
+    colors: [],
+    sizes: [],
   });
 
   const [toggledData, setToggledData] = useState({
     material: [],
     brand: [],
-    price: [],
+    color: [],
+    size: [],
+    minFilterPrice: minPrice,
+    maxFilterPrice: maxPrice,
   });
 
   useEffect(() => {
@@ -51,26 +54,54 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             .filter((material) => material)
         )
       );
+
       const prices = products.map((product) => product.price);
       setMinPrice(Math.min(...prices));
       setMaxPrice(Math.max(...prices));
       setSliderValue([minPrice, maxPrice]);
-      // const uniquePrices = Array.from(
-      //   new Set(
-      //     products.map((product) => product.price).filter((price) => price)
-      //   )
-      // );
+
       const uniqueBrands = Array.from(
         new Set(
           products.map((product) => product.brand).filter((brand) => brand)
         )
       );
 
+      // Extract unique colors by checking if 'colors' exists
+      const uniqueColors = Array.from(
+        new Set(
+          products.flatMap(
+            (product) =>
+              product.colors?.map((color) =>
+                JSON.stringify({
+                  red: color.red,
+                  green: color.green,
+                  blue: color.blue,
+                })
+              ) || [] // If colors is undefined, return an empty array
+          )
+        )
+      ).map((color) => {
+        const { red, green, blue } = JSON.parse(color);
+        return `rgb(${red}, ${green}, ${blue})`; // Convert back to rgb string
+      });
+
+      // Extract unique sizes by checking if 'sizes' exists
+      const uniqueSizes = Array.from(
+        new Set(
+          products.flatMap(
+            (product) => product.sizes?.map((size) => size.name) || []
+          ) // If sizes is undefined, return an empty array
+        )
+      );
+
+      console.log("Unique sizes: ", uniqueSizes);
+
       // Update the filterData state
       setFilterData({
         materials: uniqueMaterials,
-        prices: prices,
         brands: uniqueBrands,
+        colors: uniqueColors,
+        sizes: uniqueSizes,
       });
     };
     updateFilterData();
@@ -82,12 +113,21 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
 
   const handleSliderChange = (event, newValue) => {
     setSliderValue(newValue);
+    setToggledData((prev) => ({
+      ...prev,
+      minFilterPrice: newValue[0],
+      maxFilterPrice: newValue[1],
+    }));
   };
 
   const handleMinPriceChange = (event) => {
     const newMinPrice = event.target.value;
     if (newMinPrice >= minPrice && newMinPrice <= maxPrice) {
       setSliderValue([newMinPrice, sliderValue[1]]);
+      setToggledData((prev) => ({
+        ...prev,
+        minFilterPrice: newMinPrice,
+      }));
     }
   };
 
@@ -95,6 +135,10 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
     const newMaxPrice = event.target.value;
     if (newMaxPrice >= minPrice && newMaxPrice <= maxPrice) {
       setSliderValue([sliderValue[0], newMaxPrice]);
+      setToggledData((prev) => ({
+        ...prev,
+        maxFilterPrice: newMaxPrice,
+      }));
     }
   };
 
@@ -103,6 +147,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
       const updatedItems = prev[chosenFilter].includes(item)
         ? prev[chosenFilter].filter((i) => i !== item)
         : [...prev[chosenFilter], item];
+
       return { ...prev, [chosenFilter]: updatedItems };
     });
   };
@@ -121,12 +166,40 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
 
     Object.keys(toggledData).forEach((key) => {
       const selectedValues = toggledData[key];
-      if (selectedValues.length > 0) {
+      if (key === "minFilterPrice" || key === "maxFilterPrice") {
+        filteredProducts = filteredProducts.filter(
+          (product) =>
+            product.price >= toggledData.minFilterPrice &&
+            product.price <= toggledData.maxFilterPrice
+        );
+      } else if (key === "color" && selectedValues.length > 0) {
+        filteredProducts = filteredProducts.filter((product) =>
+          product.colors.some((color) =>
+            selectedValues.includes(
+              `rgb(${color.red}, ${color.green}, ${color.blue})`
+            )
+          )
+        );
+      } else if (key === "size" && selectedValues.length > 0) {
+        filteredProducts = filteredProducts.filter((product) =>
+          product.sizes.some((size) => selectedValues.includes(size.name))
+        );
+      } else if (selectedValues.length > 0) {
         filteredProducts = filteredProducts.filter((product) =>
           selectedValues.includes(product[key])
         );
       }
     });
+
+    if (filteredProducts.length > 0) {
+      const prices = filteredProducts.map((product) => product.price);
+      const newMinPrice = Math.min(...prices);
+      const newMaxPrice = Math.max(...prices);
+
+      setMinPrice(newMinPrice);
+      setMaxPrice(newMaxPrice);
+      setSliderValue([newMinPrice, newMaxPrice]);
+    }
 
     setProducts(filteredProducts);
   };
@@ -135,7 +208,8 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
     setToggledData({
       material: [],
       brand: [],
-      price: [],
+      color: [],
+      size: [],
     });
     setProducts(originalProducts);
   };
@@ -173,11 +247,41 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
           </List>
         );
       case "Rozmiar":
-        return <Typography variant="body2">Select a size filter</Typography>;
+        return (
+          <List>
+            {filterData.sizes.map((size, index) => (
+              <ListItem
+                button="true"
+                key={index}
+                onClick={() => toggleFilter("size", size)}
+                style={renderButtonStyle("size", size)}
+              >
+                <ListItemText
+                  disableTypography
+                  primary={size}
+                  style={{
+                    color: "gold",
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                    textAlign: "center",
+                  }}
+                />
+              </ListItem>
+            ))}
+          </List>
+        );
       case "Cena":
         return (
-          <Box sx={{ width: 300 }}>
-            {/* <Slider
+          <Box
+            sx={{
+              width: 300,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <Slider
+              sx={{ width: "80%", color: "gold" }}
               value={sliderValue}
               min={minPrice}
               max={maxPrice}
@@ -185,8 +289,19 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
               valueLabelDisplay="auto"
               valueLabelFormat={(value) => `$${value}`}
             />
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "80%",
+              }}
+            >
               <Input
+                sx={{
+                  width: "fit-content",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
                 value={sliderValue[0]}
                 onChange={handleMinPriceChange}
                 inputProps={{
@@ -197,6 +312,11 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                 }}
               />
               <Input
+                sx={{
+                  width: "fit-content",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
                 value={sliderValue[1]}
                 onChange={handleMaxPriceChange}
                 inputProps={{
@@ -206,7 +326,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                   type: "number",
                 }}
               />
-            </Box> */}
+            </Box>
           </Box>
         );
       case "Marka":
@@ -214,18 +334,64 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
           <List>
             {filterData.brands.map((brand, index) => (
               <ListItem
-                button={true}
+                button="true"
                 key={index}
                 onClick={() => toggleFilter("brand", brand)}
-                selected={toggledData.brand.includes(brand)}
+                style={renderButtonStyle("brand", brand)}
               >
-                <ListItemText primary={brand} />
+                <ListItemText
+                  disableTypography
+                  primary={brand}
+                  style={{
+                    color: "gold",
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                  }}
+                />
               </ListItem>
             ))}
           </List>
         );
       case "Kolor":
-        return <Typography variant="body2">Select a color filter</Typography>;
+        return (
+          <List
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, 80px)", // Automatically fills the row with as many squares as fit
+              gridGap: "5px", // Space between the squares
+              padding: 0, // Remove default padding
+            }}
+          >
+            {filterData.colors.map((color, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => toggleFilter("color", color)}
+                style={renderButtonStyle("color", color)}
+              >
+                {/* Square div with background color */}
+                <div
+                  style={{
+                    width: "50px", // Adjust the size of the square
+                    height: "50px",
+                    backgroundColor: color, // color here is already in rgb(r, g, b) format
+                    borderRadius: "5px", // Optional: add rounded corners
+                    border: "black solid 2px",
+                  }}
+                ></div>
+                {/* <ListItemText
+                  disableTypography
+                  primary={color} // Display the color as rgb(r, g, b)
+                  style={{
+                    color: "gold",
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                  }}
+                /> */}
+              </ListItem>
+            ))}
+          </List>
+        );
       default:
         return (
           <Typography variant="body2">Select a filter to apply</Typography>

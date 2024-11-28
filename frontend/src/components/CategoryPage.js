@@ -10,6 +10,20 @@ const CategoryPage = () => {
   const [products, setProducts] = useState([]);
   const [originalProducts, setOriginalProducts] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
+  const [imagePath, setImagePath] = useState("");
+
+  const imageMap = {
+    obuwie: "/shoe.png",
+    koszulki: "/shirt.png",
+    spodnie: "/trousers.png",
+    kurtki: "/jacket.png",
+    sukienki: "/dress.png",
+    torebki: "/women_bag.png",
+    torby: "/bag.png",
+    pizamy: "/pyjamas.png",
+    garnitury: "/suit.png",
+  };
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +46,8 @@ const CategoryPage = () => {
           price: item.price,
           material: item.material,
           description: item.description,
+          colors: item.colors,
+          sizes: item.sizes,
         }));
 
         setProducts(productsData);
@@ -42,6 +58,14 @@ const CategoryPage = () => {
     };
     fetchData();
   }, [mainCategory, subcategory, subsubcategory]);
+
+  // Change the photo of products
+  useEffect(() => {
+    const changeImage = () => {
+      setImagePath(imageMap[subcategory]);
+    };
+    changeImage();
+  }, [subcategory]);
 
   return (
     <div className="container_page">
@@ -65,6 +89,7 @@ const CategoryPage = () => {
             price={product.price}
             material={product.material}
             description={product.description}
+            imgSrc={imagePath}
           />
         ))}
       </div>

@@ -196,7 +196,6 @@ app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
             console.error("Database query error:", err);
             return res.status(500).json({ error: "CategoryID not found!" });
           }
-          console.log(cat_id[0].category_id);
           const get_subcategory_id = `SELECT subcategory_id FROM Subcategories WHERE name = ? AND category_id = ?`;
           db.query(
             get_subcategory_id,
@@ -208,9 +207,33 @@ app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
                   .status(500)
                   .json({ error: "SubcategoryID not found!" });
               }
-              console.log(subsubcategory);
-              console.log(sub_id[0].subcategory_id);
-              query_get_products = `SELECT brand, name, price, material, description FROM Products WHERE subcategory_id = ?`;
+              query_get_products = `
+              SELECT 
+                  p.product_id,
+                  p.brand, 
+                  p.name, 
+                  p.price, 
+                  p.material, 
+                  p.description,
+                  JSON_ARRAYAGG(
+                    JSON_OBJECT('red', c.red, 'green', c.green, 'blue', c.blue)
+                ) AS colors,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT('name', s.name)
+                ) AS sizes
+              FROM 
+                  Products p
+              JOIN 
+                  Inventory i ON p.product_id = i.product_id
+              JOIN 
+                  Colors c ON i.color_id = c.color_id
+              JOIN 
+                  Sizes s ON i.size_id = s.size_id
+              WHERE 
+                  p.subcategory_id = ?
+              GROUP BY 
+                  p.product_id;
+            `;
               db.query(
                 query_get_products,
                 [sub_id[0].subcategory_id],
@@ -220,9 +243,45 @@ app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
                     return res.status(500).json({ error: "Database error" });
                   }
 
+                  // Remove duplicates from colors and sizes
+                  const parsedProducts = products.map((row) => {
+                    // Parse the colors and sizes JSON strings
+                    const colors = JSON.parse(row.colors);
+                    const sizes = JSON.parse(row.sizes);
+
+                    // Remove duplicates from colors using Set and JSON.stringify
+                    const uniqueColors = Array.from(
+                      new Set(colors.map((c) => JSON.stringify(c))) // Unique color objects
+                    ).map((e) => JSON.parse(e)); // Convert back to objects
+
+                    const orderedColors = uniqueColors.map((color) => {
+                      return {
+                        red: color.red,
+                        green: color.green,
+                        blue: color.blue,
+                      };
+                    });
+
+                    // Remove duplicates from sizes using Set and JSON.stringify
+                    const uniqueSizes = Array.from(
+                      new Set(sizes.map((s) => JSON.stringify(s))) // Unique size objects
+                    ).map((e) => JSON.parse(e)); // Convert back to objects
+
+                    return {
+                      product_id: row.product_id,
+                      brand: row.brand,
+                      name: row.name,
+                      price: row.price,
+                      material: row.material,
+                      description: row.description,
+                      colors: orderedColors, // Unique colors
+                      sizes: uniqueSizes, // Unique sizes
+                    };
+                  });
+
                   res.json({
                     subcategories: results,
-                    products: products || [],
+                    products: parsedProducts || [],
                   });
                 }
               );
@@ -233,16 +292,78 @@ app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
       // 2. Subsection is NOT specified
     } else {
       const subcategoryIds = results.map((row) => row.subcategory_id);
-      query_get_products = `SELECT brand, name, price, material, description FROM Products WHERE subcategory_id IN (?);`;
+      query_get_products = `
+      SELECT 
+          p.product_id,
+          p.brand, 
+          p.name, 
+          p.price, 
+          p.material, 
+          p.description,
+          JSON_ARRAYAGG(
+            JSON_OBJECT('red', c.red, 'green', c.green, 'blue', c.blue)
+        ) AS colors,
+        JSON_ARRAYAGG(
+            JSON_OBJECT('name', s.name)
+        ) AS sizes
+      FROM 
+          Products p
+      JOIN 
+          Inventory i ON p.product_id = i.product_id
+      JOIN 
+          Colors c ON i.color_id = c.color_id
+      JOIN 
+          Sizes s ON i.size_id = s.size_id
+      WHERE 
+          p.subcategory_id IN (?)
+      GROUP BY 
+          p.product_id;
+    `;
       db.query(query_get_products, [subcategoryIds], (err, products) => {
         if (err) {
           console.error("Database query error:", err);
           return res.status(500).json({ error: "Database error" });
         }
 
+        // Remove duplicates from colors and sizes
+        const parsedProducts = products.map((row) => {
+          // Parse the colors and sizes JSON strings
+          const colors = JSON.parse(row.colors);
+          const sizes = JSON.parse(row.sizes);
+
+          // Remove duplicates from colors using Set and JSON.stringify
+          const uniqueColors = Array.from(
+            new Set(colors.map((c) => JSON.stringify(c))) // Unique color objects
+          ).map((e) => JSON.parse(e)); // Convert back to objects
+
+          const orderedColors = uniqueColors.map((color) => {
+            return {
+              red: color.red,
+              green: color.green,
+              blue: color.blue,
+            };
+          });
+
+          // Remove duplicates from sizes using Set and JSON.stringify
+          const uniqueSizes = Array.from(
+            new Set(sizes.map((s) => JSON.stringify(s))) // Unique size objects
+          ).map((e) => JSON.parse(e)); // Convert back to objects
+
+          return {
+            product_id: row.product_id,
+            brand: row.brand,
+            name: row.name,
+            price: row.price,
+            material: row.material,
+            description: row.description,
+            colors: orderedColors, // Unique colors
+            sizes: uniqueSizes, // Unique sizes
+          };
+        });
+
         res.json({
           subcategories: results,
-          products: products || [],
+          products: parsedProducts || [],
           subcategoryIds: subcategoryIds,
         });
       });

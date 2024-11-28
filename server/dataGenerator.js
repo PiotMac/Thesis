@@ -158,4 +158,134 @@ async function generateProducts() {
   db.end();
 }
 
-generateProducts();
+//generateProducts();
+
+async function populateInventory() {
+  return new Promise((resolve, reject) => {
+    // Step 1: Query all colors
+    db.query("SELECT color_id FROM Colors", (err, colors) => {
+      if (err) return reject(err);
+
+      // Step 2: Query all sizes
+      db.query("SELECT size_id, type FROM Sizes", (err, sizes) => {
+        if (err) return reject(err);
+
+        // Step 3: Query all products
+        db.query(
+          "SELECT product_id, subcategory_id FROM Products",
+          (err, products) => {
+            if (err) return reject(err);
+
+            // Query subcategories to find product types
+            const subcategoryQuery = `
+              SELECT sc.subcategory_id, cat.type 
+              FROM Subcategories sc 
+              JOIN Categories cat ON sc.category_id = cat.category_id
+            `;
+            db.query(subcategoryQuery, (err, subcategories) => {
+              if (err) return reject(err);
+
+              // Map subcategories to their types
+              const subcategoryTypes = subcategories.reduce((map, sc) => {
+                map[sc.subcategory_id] = sc.type;
+                return map;
+              }, {});
+
+              // Step 4: Populate inventory for each product
+              const inventoryData = [];
+              products.forEach((product) => {
+                const productType = subcategoryTypes[product.subcategory_id];
+
+                // Filter sizes based on product type
+                const matchingSizes = sizes.filter(
+                  (size) => size.type === productType
+                );
+                const selectedSizes = matchingSizes
+                  .sort(() => 0.5 - Math.random())
+                  .slice(
+                    0,
+                    Math.floor(3 + Math.random() * matchingSizes.length)
+                  );
+                // Randomly select 2–6 colors
+                const selectedColors = colors
+                  .sort(() => 0.5 - Math.random())
+                  .slice(0, Math.floor(2 + Math.random() * 5));
+
+                // Create inventory entries for the product
+                selectedColors.forEach((color) => {
+                  selectedSizes.forEach((size) => {
+                    inventoryData.push([
+                      product.product_id,
+                      color.color_id,
+                      size.size_id,
+                      0, // Initial quantity
+                    ]);
+                  });
+                });
+              });
+
+              // Step 5: Insert into Inventory
+              const query = `
+                INSERT INTO Inventory (product_id, color_id, size_id, quantity) 
+                VALUES ?`;
+              db.query(query, [inventoryData], (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+              });
+            });
+          }
+        );
+      });
+    });
+  });
+}
+
+async function generateInventory() {
+  await populateInventory()
+    .then(() => console.log("Inventory populated successfully!"))
+    .catch((err) => console.error(err));
+  db.end();
+}
+
+generateInventory();
+
+// async function generateInventory() {
+//   try {
+//     const categoryRes = await getCategories();
+//     categories = categoryRes.map((row) => ({
+//       id: row.category_id,
+//       name: row.name,
+//       section: row.section,
+//     }));
+//     console.log("Categories loaded:", categories.length);
+//   } catch (err) {
+//     console.error("Error retrieving categories:", err);
+//     return; // Exit if there's an error with categories
+//   }
+
+//   for (let i = 0; i < 1000; i++) {
+//     // Choosing random category
+//     const category_id = Math.floor(Math.random() * categories.length + 1);
+//     let subcategory_id;
+//     try {
+//       // Retrieving according subcategories for the selected category
+//       const subcategoryRes = await getSubcategories(category_id);
+//       subcategories = subcategoryRes.map((row) => ({
+//         id: row.subcategory_id,
+//         name: row.name,
+//         section: row.category_id,
+//       }));
+
+//       // Choosing random subcategory
+//       const randomSubcategory =
+//         subcategories[Math.floor(Math.random() * subcategories.length)];
+//       subcategory_id = randomSubcategory.id;
+//     } catch (err) {
+//       console.error("Error retrieving subcategories:", err);
+//     }
+
+//   }
+//   db.end();
+// }
+
+// generateInventory();
