@@ -14,7 +14,7 @@ const ProductSquare = ({
 
   // Function to handle the click and navigate to the provided link
   const handleClick = () => {
-    navigate(`/products/${product_id}`);
+    navigate(`/products/${product_id}`, { state: { image: imgSrc } });
   };
 
   return (

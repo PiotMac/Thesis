@@ -159,7 +159,7 @@ app.get("/products/:product_id", (req, res) => {
   p.price, 
   p.material, 
   p.description, 
-  p.brand, 
+  p.brand,
   JSON_ARRAYAGG(
     JSON_OBJECT(
         'size', s.name,

@@ -200,12 +200,7 @@ async function populateInventory() {
                 const matchingSizes = sizes.filter(
                   (size) => size.type === productType
                 );
-                const selectedSizes = matchingSizes
-                  .sort(() => 0.5 - Math.random())
-                  .slice(
-                    0,
-                    Math.floor(3 + Math.random() * matchingSizes.length)
-                  );
+
                 // Randomly select 2–6 colors
                 const selectedColors = colors
                   .sort(() => 0.5 - Math.random())
@@ -213,6 +208,12 @@ async function populateInventory() {
 
                 // Create inventory entries for the product
                 selectedColors.forEach((color) => {
+                  const selectedSizes = matchingSizes
+                    .sort(() => 0.5 - Math.random())
+                    .slice(
+                      0,
+                      Math.floor(3 + Math.random() * matchingSizes.length)
+                    );
                   selectedSizes.forEach((size) => {
                     inventoryData.push([
                       product.product_id,

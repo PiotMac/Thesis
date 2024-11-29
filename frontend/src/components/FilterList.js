@@ -231,7 +231,10 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                 button="true"
                 key={index}
                 onClick={() => toggleFilter("material", material)}
-                style={renderButtonStyle("material", material)}
+                style={{
+                  ...renderButtonStyle("material", material),
+                  cursor: "pointer",
+                }}
               >
                 <ListItemText
                   disableTypography
@@ -254,7 +257,10 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                 button="true"
                 key={index}
                 onClick={() => toggleFilter("size", size)}
-                style={renderButtonStyle("size", size)}
+                style={{
+                  ...renderButtonStyle("size", size),
+                  cursor: "pointer",
+                }}
               >
                 <ListItemText
                   disableTypography
@@ -337,7 +343,10 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                 button="true"
                 key={index}
                 onClick={() => toggleFilter("brand", brand)}
-                style={renderButtonStyle("brand", brand)}
+                style={{
+                  ...renderButtonStyle("brand", brand),
+                  cursor: "pointer",
+                }}
               >
                 <ListItemText
                   disableTypography
@@ -367,7 +376,10 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                 button
                 key={index}
                 onClick={() => toggleFilter("color", color)}
-                style={renderButtonStyle("color", color)}
+                style={{
+                  ...renderButtonStyle("color", color),
+                  cursor: "pointer",
+                }}
               >
                 {/* Square div with background color */}
                 <div
@@ -379,15 +391,6 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
                     border: "black solid 2px",
                   }}
                 ></div>
-                {/* <ListItemText
-                  disableTypography
-                  primary={color} // Display the color as rgb(r, g, b)
-                  style={{
-                    color: "gold",
-                    fontWeight: "bold",
-                    fontSize: "20px",
-                  }}
-                /> */}
               </ListItem>
             ))}
           </List>
