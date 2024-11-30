@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT"],
   })
 );
 
@@ -75,11 +75,8 @@ app.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log(password);
-    console.log(user.password);
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(isPasswordValid);
+
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -101,10 +98,138 @@ app.post("/login", async (req, res) => {
 
 app.get("/profile", authenticateToken, (req, res) => {
   const email = req.user.email;
-  db.query("SELECT * FROM Users WHERE email = ?", [email], (err, result) => {
-    if (err) return res.status(500).send("Error fetching profile");
+  const query = `
+    SELECT Users.*, Addresses.*
+    FROM Users
+    LEFT JOIN Addresses ON Users.address_id = Addresses.address_id
+    WHERE Users.email = ?
+  `;
+
+  db.query(query, [email], (err, result) => {
+    if (err) {
+      console.error(err); // Log the error for debugging
+      return res.status(500).send("Error fetching profile");
+    }
+
+    if (result.length === 0) {
+      return res.status(404).send("User not found");
+    }
+
     res.json(result[0]);
   });
+});
+
+app.put("/profile", authenticateToken, async (req, res) => {
+  const type = req.body.type;
+  const email = req.user.email;
+
+  if (type === "basic") {
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+
+    const query =
+      "UPDATE Users SET first_name = ?, surname = ? WHERE email = ?";
+
+    db.query(query, [firstName, lastName, email], (err, result) => {
+      if (err) return res.status(500).send("Error updating profile basic info");
+      res.json({
+        success: true,
+        message: "Profile basic info updated successfully",
+      });
+    });
+  } else if (type === "address") {
+    if (req.body.address_id) {
+      // Update existing address
+      const updateAddressQuery = `
+        UPDATE Addresses
+        SET street = ?, house_nr = ?, appartment_nr = ?, city = ?, zipcode = ?
+        WHERE address_id = ?
+      `;
+
+      db.query(
+        updateAddressQuery,
+        [
+          req.body.street,
+          req.body.house_nr,
+          req.body.appartment_nr,
+          req.body.city,
+          req.body.zipcode,
+          req.body.address_id,
+        ],
+        (err, result) => {
+          if (err) return res.status(500).send("Error updating address");
+
+          res.json({
+            success: true,
+            message: "Address updated successfully",
+          });
+        }
+      );
+    } else {
+      // Create a new address
+      const insertAddressQuery = `
+        INSERT INTO Addresses (street, house_nr, appartment_nr, city, zipcode)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        insertAddressQuery,
+        [
+          req.body.street,
+          req.body.house_nr,
+          req.body.appartment_nr,
+          req.body.city,
+          req.body.zipcode,
+        ],
+        (err, result) => {
+          if (err) return res.status(500).send("Error inserting address");
+          const newAddressId = result.insertId;
+
+          // Update the user's address_id to the newly created address_id
+          const updateUserQuery =
+            "UPDATE Users SET address_id = ? WHERE email = ?";
+          db.query(
+            updateUserQuery,
+            [newAddressId, req.body.email],
+            (err, result) => {
+              if (err)
+                return res.status(500).send("Error linking address to user");
+
+              res.json({
+                success: true,
+                message: "Address created and linked to user successfully",
+              });
+            }
+          );
+        }
+      );
+    }
+  } else if (type === "password") {
+    const codedPassword = req.body.codedPassword;
+    const currentPassword = req.body.currentPassword;
+    const newPassword = req.body.newPassword;
+
+    const isOldPasswordCorrect = await bcrypt.compare(
+      currentPassword,
+      codedPassword
+    );
+    if (!isOldPasswordCorrect) {
+      return res.status(401).json({ error: "Incorrect old password!" });
+    }
+
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    const query = `UPDATE Users SET password = ? WHERE email = ?`;
+    db.query(query, [hashedNewPassword, email], (err, results) => {
+      if (err) {
+        return res.status(500).send("Error updating a password!");
+      }
+      res.json({
+        success: true,
+        message: "Password successfully updated!",
+      });
+    });
+  }
 });
 
 function authenticateToken(req, res, next) {

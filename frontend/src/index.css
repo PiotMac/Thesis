@@ -269,6 +269,9 @@ footer {
 
 .password-criteria {
   text-align: left;
+  border: black solid 2px;
+  border-radius: 10px;
+  background-color: var(--navbar-color);
 }
 
 .password-criteria ul li {
@@ -282,8 +285,14 @@ footer {
 
 .profile-container {
   display: grid;
+  grid-template-areas:
+    "header header header"
+    "profile-basic-info profile-password-info profile-address-info"
+    "profile-basic-info profile-password-info profile-address-info"
+    "button-info button-password button-address";
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  justify-items: center;
+  gap: 50px;
   padding: 20px;
   flex: 1;
   background-color: var(--primary-color);
@@ -293,6 +302,61 @@ footer {
   box-sizing: border-box;
   border-radius: 8px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-basic-info, .profile-password, .profile-address {
+  background-color: var(--navbar-color);
+  border: black solid 2px;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.profile-basic-info {
+  grid-area: profile-basic-info;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+}
+
+#button-info, #button-password, #button-address {
+  width: fit-content;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+#button-info {
+  grid-area: button-info;
+}
+
+#button-password {
+  grid-area: button-password;
+}
+
+
+#button-address {
+  grid-area: button-address;
+}
+
+
+.profile-password {
+  grid-area: profile-password-info;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+}
+
+.profile-address {
+  grid-area: profile-address-info;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 80%;
+}
+
+.profile-container h3 {
+  color: gold;
 }
 
 .profile-container h2 {
