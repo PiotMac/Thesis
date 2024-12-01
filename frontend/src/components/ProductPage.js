@@ -42,6 +42,10 @@ const ProductPage = () => {
         }
         const data = await response.json();
 
+        const filteredVariations = data.available_variations.filter(
+          (variation) => variation.quantity > 0
+        );
+
         setProductData({
           product_id: data.product_id,
           name: data.name,
@@ -49,12 +53,12 @@ const ProductPage = () => {
           material: data.material,
           description: data.description,
           brand: data.brand,
-          available_variations: data.available_variations,
+          available_variations: filteredVariations,
         });
 
         const uniqueColors = [
           ...new Map(
-            data.available_variations.map((variation) => [
+            filteredVariations.map((variation) => [
               variation.color.color_id,
               {
                 color_id: variation.color.color_id,
@@ -68,7 +72,7 @@ const ProductPage = () => {
 
         const uniqueSizes = [
           ...new Map(
-            data.available_variations.map((variation) => [
+            filteredVariations.map((variation) => [
               variation.size.size_id,
               {
                 size_id: variation.size.size_id,
@@ -88,7 +92,7 @@ const ProductPage = () => {
 
         const defaultColor = uniqueColors[0];
 
-        const sizesForColor = data.available_variations
+        const sizesForColor = filteredVariations
           .filter(
             (variation) => variation.color.color_id === defaultColor.color_id
           )
@@ -190,6 +194,10 @@ const ProductPage = () => {
       <div className="product-image-and-button-container">
         <div className="product-image-container">
           <img src={location.state.image} alt={productData.name} />
+        </div>
+        <div className="product-material-and-description">
+          <h1>Material: {productData.material}</h1>
+          <h2>{productData.description}</h2>
         </div>
         <button onClick={addToCart}>Add to cart</button>
       </div>

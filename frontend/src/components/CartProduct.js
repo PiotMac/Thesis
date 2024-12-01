@@ -1,6 +1,7 @@
 import React from "react";
 
 const CartProduct = ({ item, onEdit, onDelete }) => {
+  const isOutOfStock = item.inventory_quantity === 0;
   return (
     <div className="cart-product-container">
       <div className="cart-product-left">
@@ -20,6 +21,11 @@ const CartProduct = ({ item, onEdit, onDelete }) => {
           ></div>
         </div>
         <h2>Ilość: {item.quantity}</h2>
+        {isOutOfStock && (
+          <h3 style={{ color: "red", fontWeight: "bold" }}>
+            PRODUKT NIEDOSTĘPNY
+          </h3>
+        )}
       </div>
       <div className="cart-product-right">
         <div className="cart-product-right-top">
@@ -30,7 +36,14 @@ const CartProduct = ({ item, onEdit, onDelete }) => {
           <div className="product-button-container">
             <button
               id="edit-product-button"
-              onClick={() => onEdit(item.cart_id, item.quantity, item.price)}
+              onClick={() =>
+                onEdit(
+                  item.cart_id,
+                  item.quantity,
+                  item.price,
+                  item.inventory_quantity
+                )
+              }
             >
               Edytuj
             </button>

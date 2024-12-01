@@ -431,7 +431,7 @@ app.post("/products/:product_id", authenticateToken, (req, res) => {
   const user_id = req.user.userId;
 
   // Get the inventory ID
-  const getInvQuery = `SELECT id FROM Inventory WHERE product_id = ? AND color_id = ? AND size_id = ?`;
+  const getInvQuery = `SELECT id, quantity FROM Inventory WHERE product_id = ? AND color_id = ? AND size_id = ?`;
   db.query(getInvQuery, [product_id, color_id, size_id], (err, results) => {
     if (err) {
       return res.status(500).send("Error getting Inventory ID!");
@@ -443,6 +443,7 @@ app.post("/products/:product_id", authenticateToken, (req, res) => {
 
     // Check if the item already exists in the cart for this user
     const inventoryId = results[0].id;
+    const inventoryQuantity = results[0].quantity;
 
     const checkCartQuery = `
     SELECT * FROM Carts

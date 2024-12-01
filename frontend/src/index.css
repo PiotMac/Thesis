@@ -197,17 +197,13 @@ footer {
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
   padding: 40px;
   width: 320px;
+  gap: 20px;
 }
 
 .login-title, .register-title {
   font-size: 1.8rem;
-  margin-bottom: 1rem;
   color: var(--text-color);
   text-align: center;
-}
-
-.input-group {
-  margin-bottom: 20px;
 }
 
 .input-group label {
@@ -272,6 +268,12 @@ footer {
   border: black solid 2px;
   border-radius: 10px;
   background-color: var(--navbar-color);
+}
+
+.password-criteria ul {
+  text-align: left;
+  padding: 20px;
+  margin: 0px;
 }
 
 .password-criteria ul li {
@@ -644,7 +646,7 @@ footer {
   background-color: gold;
   font-weight: bold;
   font-size: 50px;
-  margin-top: 50px;
+  margin-top: 10px;
   font-family: inherit;
   border-radius: 10px;
   transition: transform 0.2s ease-in-out;
@@ -653,6 +655,19 @@ footer {
 
 .product-image-and-button-container button:hover {
   transform: scale(1.05);
+}
+
+.product-material-and-description {
+  padding: 20px;
+  text-align: center;
+}
+
+.product-material-and-description h1 {
+  color: gold;
+}
+
+.product-material-and-description h2 {
+  color: white;
 }
 
 .product-info-container {

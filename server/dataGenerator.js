@@ -248,7 +248,29 @@ async function generateInventory() {
   db.end();
 }
 
-generateInventory();
+// generateInventory();
+
+async function createInventoryQuantity() {
+  return new Promise((resolve, reject) => {
+    db.query(
+      `UPDATE Inventory
+    SET quantity = FLOOR(RAND() * 16)`,
+      (err) => {
+        if (err) return reject(err);
+        resolve();
+      }
+    );
+  });
+}
+
+async function generateInventoryQuantity() {
+  await createInventoryQuantity()
+    .then(() => console.log("Inventory's quantity populated successfully!"))
+    .catch((err) => console.log(err));
+  db.end();
+}
+
+generateInventoryQuantity();
 
 // async function generateInventory() {
 //   try {

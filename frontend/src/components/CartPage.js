@@ -29,7 +29,7 @@ const CartPage = () => {
         }
         const data = await response.json();
         const totalPriceOfProducts = data.reduce((total, item) => {
-          return total + item.total_price;
+          return item.inventory_quantity > 0 ? total + item.total_price : total;
         }, 0);
 
         setCartItems(data);
@@ -42,13 +42,25 @@ const CartPage = () => {
     fetchAllItems();
   }, []);
 
-  const editProduct = async (cart_id, currentQuantity, itemPrice) => {
+  const editProduct = async (
+    cart_id,
+    currentQuantity,
+    itemPrice,
+    itemInventoryQuantity
+  ) => {
     const newQuantity = parseInt(
-      prompt("Enter the new quantity:", currentQuantity),
+      prompt(
+        `Enter the new quantity (maximum ${itemInventoryQuantity}):`,
+        currentQuantity
+      ),
       10
     );
-    // TODO: Add inventory.quantity as maximum
-    if (!newQuantity || newQuantity <= 0) {
+
+    if (
+      !newQuantity ||
+      newQuantity <= 0 ||
+      newQuantity > itemInventoryQuantity
+    ) {
       alert("Invalid quantity!");
       return;
     }
@@ -145,7 +157,7 @@ const CartPage = () => {
         <h1>Podsumowanie</h1>
         <div className="price-sum-container">
           <h2>Łącznie: </h2>
-          <h2 id="total-price-header">{totalPrice}zł</h2>
+          <h2 id="total-price-header">{totalPrice.toFixed(2)}zł</h2>
         </div>
         <div className="pay-button-container">
           <button>Zapłać</button>
