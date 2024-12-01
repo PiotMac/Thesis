@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import {
-  Slider,
-  Drawer,
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Input,
-} from "@mui/material";
+import { List, ListItem, ListItemText } from "@mui/material";
 
 const ProductPage = () => {
   const { product_id } = useParams();
@@ -25,28 +16,27 @@ const ProductPage = () => {
     available_variations: [],
   });
 
-  const [filterData, setFilterData] = useState({
-    colors: [],
-    sizes: [],
-  });
-
   const [toggledData, setToggledData] = useState({
+    color_id: "",
     color: "",
+    size_id: "",
     size: "",
   });
 
   const [uniqueColors, setUniqueColors] = useState([]);
-  const [uniqueSizes, setUniqueSizes] = useState([]);
   const [sizesForColor, setSizesForColor] = useState([]);
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:4000/products/${product_id}`
+          `http://localhost:4000/products/${product_id}`,
+          {
+            method: "GET",
+          }
         );
         if (!response.ok) {
-          const errorText = await response.text(); // Get the response text
+          const errorText = await response.text();
           console.log("Error response:", errorText);
           throw new Error("Failed to fetch a product");
         }
@@ -63,48 +53,55 @@ const ProductPage = () => {
         });
 
         const uniqueColors = [
-          ...new Set(
-            data.available_variations.map(
-              (variation) =>
-                `${variation.color.red},${variation.color.green},${variation.color.blue}`
-            )
-          ),
+          ...new Map(
+            data.available_variations.map((variation) => [
+              variation.color.color_id,
+              {
+                color_id: variation.color.color_id,
+                red: variation.color.red,
+                green: variation.color.green,
+                blue: variation.color.blue,
+              },
+            ])
+          ).values(),
         ];
 
-        console.log("Colors: ", uniqueColors);
-
         const uniqueSizes = [
-          ...new Set(
-            data.available_variations.map((variation) => variation.size)
-          ),
+          ...new Map(
+            data.available_variations.map((variation) => [
+              variation.size.size_id,
+              {
+                size_id: variation.size.size_id,
+                size_name: variation.size.size_name,
+              },
+            ])
+          ).values(),
         ];
 
         const sortedUniqueSizes = uniqueSizes.some(
-          (size) => !isNaN(Number(size))
+          (size) => !isNaN(Number(size.size_name))
         )
-          ? uniqueSizes.sort((a, b) => Number(a) - Number(b))
+          ? uniqueSizes.sort(
+              (a, b) => Number(a.size_name) - Number(b.size_name)
+            )
           : uniqueSizes;
 
-        console.log("Sizes: ", uniqueSizes);
-        console.log("Options: ", data.available_variations);
+        const defaultColor = uniqueColors[0];
 
-        const [red, green, blue] = uniqueColors[0].split(",");
         const sizesForColor = data.available_variations
           .filter(
-            (variation) =>
-              variation.color.red == red &&
-              variation.color.green == green &&
-              variation.color.blue == blue
+            (variation) => variation.color.color_id === defaultColor.color_id
           )
-          .map((variation) => variation.size);
-
-        console.log("Chosen color: ", uniqueColors[0]);
-        console.log("Avail: ", sizesForColor);
+          .map((variation) => ({
+            size_id: variation.size.size_id,
+            size_name: variation.size.size_name,
+          }));
 
         setUniqueColors(uniqueColors);
         setSizesForColor(sizesForColor);
         setToggledData({
-          color: uniqueColors[0],
+          color_id: defaultColor.color_id,
+          color: `${defaultColor.red},${defaultColor.green},${defaultColor.blue}`,
         });
       } catch (error) {
         console.error("Error fetching product data:", error);
@@ -114,31 +111,24 @@ const ProductPage = () => {
     fetchProductData();
   }, [product_id]);
 
-  useEffect(() => {
-    console.log(toggledData);
-  }, [toggledData]);
-
   const handleColorChange = (selectedColor) => {
-    const [red, green, blue] = selectedColor.split(",");
-
-    setToggledData({ color: selectedColor });
-
-    console.log("Chosen color: ", selectedColor);
-    console.log("Avail: ", productData.available_variations);
+    setToggledData((prev) => ({
+      ...prev,
+      color_id: selectedColor.color_id,
+      color: `${selectedColor.red},${selectedColor.green},${selectedColor.blue}`,
+    }));
 
     // Filter sizes corresponding to the selected color
     const sizesForColor = productData.available_variations
       .filter(
-        (variation) =>
-          variation.color.red == red &&
-          variation.color.green == green &&
-          variation.color.blue == blue
+        (variation) => variation.color.color_id === selectedColor.color_id
       )
-      .map((variation) => variation.size);
+      .map((variation) => ({
+        size_id: variation.size.size_id,
+        size_name: variation.size.size_name,
+      }));
 
-    console.log(sizesForColor);
-
-    // // Update the state with filtered sizes
+    // Update the state with filtered sizes
     setSizesForColor(sizesForColor);
   };
 
@@ -147,6 +137,49 @@ const ProductPage = () => {
     return toggledData[chosenFilter] === item
       ? { backgroundColor: "#8E05C2", border: "1px solid #ccc" }
       : {};
+  };
+
+  const addToCart = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Log in to add items to the cart!");
+      return;
+    }
+    // const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (!toggledData.size) {
+      alert("Pick a size!");
+      return;
+    }
+    const newItem = {
+      product_id: productData.product_id,
+      color_id: toggledData.color_id,
+      size_id: toggledData.size_id,
+    };
+
+    try {
+      const response = await fetch(
+        `http://localhost:4000/products/${product_id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newItem),
+        }
+      );
+
+      if (response.ok) {
+        alert("Item added to the cart!");
+      } else {
+        const errorData = await response.json();
+        console.log(errorData);
+        alert("Failed to add item to the cart...");
+      }
+    } catch (error) {
+      console.error("[CART] Error adding item:", error);
+      alert("An error occurred while adding the item to the cart.");
+    }
   };
 
   return (
@@ -158,7 +191,7 @@ const ProductPage = () => {
         <div className="product-image-container">
           <img src={location.state.image} alt={productData.name} />
         </div>
-        <button>Add to cart</button>
+        <button onClick={addToCart}>Add to cart</button>
       </div>
       <div className="product-info-container">
         <div className="product-info">
@@ -185,7 +218,10 @@ const ProductPage = () => {
                 key={index}
                 onClick={() => handleColorChange(color)}
                 style={{
-                  ...renderButtonStyle("color", color),
+                  ...renderButtonStyle(
+                    "color",
+                    `${color.red},${color.green},${color.blue}`
+                  ),
                   cursor: "pointer",
                 }}
               >
@@ -193,7 +229,7 @@ const ProductPage = () => {
                   style={{
                     width: "100px",
                     height: "100px",
-                    backgroundColor: `rgb(${color})`,
+                    backgroundColor: `rgb(${color.red},${color.green},${color.blue}`,
                     borderRadius: "5px",
                     border: "black solid 2px",
                   }}
@@ -220,10 +256,14 @@ const ProductPage = () => {
                 button
                 key={index}
                 onClick={() =>
-                  setToggledData((prev) => ({ ...prev, size: size }))
+                  setToggledData((prev) => ({
+                    ...prev,
+                    size_id: size.size_id,
+                    size: size.size_name,
+                  }))
                 }
                 style={{
-                  ...renderButtonStyle("size", size),
+                  ...renderButtonStyle("size", size.size_name),
                   //   border: "black solid 2px",
                   //   borderRadius: "5px",
                   //   minWidth: "fit-content",
@@ -234,7 +274,7 @@ const ProductPage = () => {
               >
                 <ListItemText
                   disableTypography
-                  primary={size}
+                  primary={size.size_name}
                   style={{
                     color: "gold",
                     fontWeight: "bold",

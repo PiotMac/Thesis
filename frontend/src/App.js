@@ -11,6 +11,7 @@ import Register from "./components/Register";
 import UserProfile from "./components/UserProfile";
 import CategoryPage from "./components/CategoryPage";
 import ProductPage from "./components/ProductPage";
+import CartPage from "./components/CartPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,6 +61,7 @@ function App() {
                 element={<CategoryPage />}
               />
               <Route path="/products/:product_id" element={<ProductPage />} />
+              <Route path="/cart" element={<CartPage />} />
             </Routes>
           </div>
           <Footer />

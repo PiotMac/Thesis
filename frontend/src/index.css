@@ -646,7 +646,13 @@ footer {
   font-size: 50px;
   margin-top: 50px;
   font-family: inherit;
+  border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
   cursor: pointer;
+}
+
+.product-image-and-button-container button:hover {
+  transform: scale(1.05);
 }
 
 .product-info-container {
@@ -683,4 +689,144 @@ footer {
 .product-sizes-container {
   width: fit-content;
   padding: 20px;
+}
+
+.cart-page-container {
+  display: flex;
+  flex-direction: row;
+  padding: 40px;
+  gap: 40px;
+}
+
+.cart-product-list {
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cart-price-button-container {
+  width: 35%;
+  height: fit-content;
+  padding: 20px;
+  background-color: gold;
+  border-radius: 10px;
+  border: black solid 3px;
+}
+
+#total-price-header {
+  text-align: right;
+  font-size: 200%;
+}
+
+.pay-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.pay-button-container button {
+  width: 30%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 100%;
+  background-color: var(--navbar-color);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.pay-button-container button:hover {
+  transform: scale(1.1);
+}
+
+.cart-product-container {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  background-color: var(--navbar-color);
+  border-radius: 20px;
+  border: black solid 5px;
+}
+
+.cart-product-left {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.cart-product-left h1 {
+  color: gold;
+}
+
+#cart-product-brand {
+  color: var(--text-color);
+}
+
+.cart-product-right {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  justify-content: center;
+  text-align: right;
+  padding: 10px;
+}
+
+.cart-product-right h1 {
+  color: orange;
+}
+
+.cart-product-right-top {
+  height: 70%;
+}
+
+.cart-product-right-bottom {
+  position: relative;
+  height: 30%;
+}
+
+.product-button-container {
+  width: 100%;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: end;
+}
+
+.product-button-container button {
+  width: 30%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.product-button-container button:hover {
+  transform: scale(1.1);
+}
+
+#edit-product-button {
+  background-color: grey;
+}
+
+#delete-product-button {
+  background-color: red;
+}
+
+#color-cart-product-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
 }

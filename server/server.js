@@ -277,6 +277,99 @@ async function hashPassword(password) {
   return hashedPassword;
 }
 
+// Endpoint to get all the items in the user's cart
+app.get("/cart", authenticateToken, (req, res) => {
+  const user_id = req.user.userId;
+
+  const query = `
+    SELECT 
+      c.cart_id, 
+      c.quantity, 
+      p.product_id, 
+      p.name, 
+      p.price, 
+      p.material, 
+      p.description, 
+      p.brand, 
+      i.color_id, 
+      i.size_id, 
+      i.quantity AS inventory_quantity, 
+      c.quantity * p.price AS total_price, 
+      c.quantity AS cart_quantity, 
+      s.name AS size_name, 
+      color.red, 
+      color.green, 
+      color.blue 
+    FROM 
+      Carts c
+    JOIN 
+      Inventory i ON c.inventory_id = i.id
+    JOIN 
+      Products p ON i.product_id = p.product_id
+    JOIN 
+      Sizes s ON i.size_id = s.size_id
+    JOIN 
+      Colors color ON i.color_id = color.color_id
+    WHERE 
+      c.user_id = ?;
+  `;
+
+  db.query(query, [user_id], (err, results) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Database error during cart info selection!" });
+    }
+
+    res.json(results);
+  });
+});
+
+// Endpoint to edit an item in the user's cart
+app.put("/cart", authenticateToken, (req, res) => {
+  const user_id = req.user.userId;
+  const cart_id = req.body.cartID;
+  const newQuantity = req.body.newQuantity;
+
+  if (!user_id) {
+    return res.status(500);
+  }
+
+  const query = `UPDATE Carts SET quantity = ?
+  WHERE cart_id = ?`;
+
+  db.query(query, [newQuantity, cart_id], (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Database error during cart product edition!" });
+    }
+    return res.json({ success: true, message: "Cart updated!" });
+  });
+});
+
+// Endpoint to delete an item from the user's cart
+app.delete("/cart", authenticateToken, (req, res) => {
+  const user_id = req.user.userId;
+  const cart_id = req.body.cartID;
+
+  if (!user_id) {
+    return res.status(500);
+  }
+
+  const query = `DELETE FROM Carts WHERE cart_id = ?`;
+
+  db.query(query, [cart_id], (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Database error during cart product deletion!" });
+    }
+    return res.json({ success: true, message: "Cart product deleted!" });
+  });
+});
+
+// Endpoint to fetch all the product's information
 app.get("/products/:product_id", (req, res) => {
   const { product_id } = req.params;
   const query = `SELECT p.product_id, 
@@ -287,8 +380,8 @@ app.get("/products/:product_id", (req, res) => {
   p.brand,
   JSON_ARRAYAGG(
     JSON_OBJECT(
-        'size', s.name,
-        'color', JSON_OBJECT('red', c.red, 'green', c.green, 'blue', c.blue),
+        'size', JSON_OBJECT('size_id', s.size_id, 'size_name', s.name),
+        'color', JSON_OBJECT('color_id', c.color_id, 'red', c.red, 'green', c.green, 'blue', c.blue),
         'quantity', i.quantity
     )
 ) AS available_variations
@@ -328,6 +421,61 @@ p.product_id = ?;`;
       description: productData.description,
       brand: productData.brand,
       available_variations: JSON.parse(productData.available_variations),
+    });
+  });
+});
+
+// Adding product to the cart of a user
+app.post("/products/:product_id", authenticateToken, (req, res) => {
+  const { product_id, color_id, size_id } = req.body;
+  const user_id = req.user.userId;
+
+  // Get the inventory ID
+  const getInvQuery = `SELECT id FROM Inventory WHERE product_id = ? AND color_id = ? AND size_id = ?`;
+  db.query(getInvQuery, [product_id, color_id, size_id], (err, results) => {
+    if (err) {
+      return res.status(500).send("Error getting Inventory ID!");
+    }
+
+    if (results.length === 0) {
+      return res.status(404).send("Inventory not found!");
+    }
+
+    // Check if the item already exists in the cart for this user
+    const inventoryId = results[0].id;
+
+    const checkCartQuery = `
+    SELECT * FROM Carts
+    WHERE user_id = ? AND inventory_id = ?`;
+
+    db.query(checkCartQuery, [user_id, inventoryId], (err, results) => {
+      if (err) {
+        return res.status(500).send("Error checking cart!");
+      }
+
+      // Item already exists in the cart, update its quantity
+      if (results.length > 0) {
+        const updateQuery = `UPDATE Carts SET quantity = quantity + ?
+         WHERE user_id = ? AND inventory_id = ?`;
+        db.query(updateQuery, [1, user_id, inventoryId], (err) => {
+          if (err) {
+            return res.status(500).send("Error updating cart!");
+          }
+          return res.json({ success: true, message: "Cart updated!" });
+        });
+      }
+      // Item does not exist, create a new entry
+      else {
+        const insertCartQuery = `INSERT INTO Carts (user_id, inventory_id, quantity)
+        VALUES (?, ?, ?)`;
+        db.query(insertCartQuery, [user_id, inventoryId, 1], (err) => {
+          if (err) {
+            console.log(err);
+            return res.status(500).send("Error adding to cart!");
+          }
+          return res.json({ success: true, message: "Item added to cart!" });
+        });
+      }
     });
   });
 });

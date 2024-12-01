@@ -42,19 +42,19 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
         </li>
       </ul>
       <ul id="right-nav">
-        <li>
-          <NavLink to="/cart">
-            <IconButton
-              id="shopping_cart"
-              sx={{ color: "#8E05C2" }}
-              aria-label="add to shopping cart"
-            >
-              <AddShoppingCartIcon />
-            </IconButton>
-          </NavLink>
-        </li>
         {isLoggedIn ? (
           <>
+            <li>
+              <NavLink to="/cart">
+                <IconButton
+                  id="shopping_cart"
+                  sx={{ color: "#8E05C2" }}
+                  aria-label="add to shopping cart"
+                >
+                  <AddShoppingCartIcon />
+                </IconButton>
+              </NavLink>
+            </li>
             <li>
               <NavLink to="/profile">Profil</NavLink>
             </li>
