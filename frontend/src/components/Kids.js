@@ -5,35 +5,31 @@ const Kids = () => {
   return (
     <div className="app">
       <div className="categories_grid">
-        <CategorySquare
-          imageSrc="/shoe.png"
-          text="Obuwie"
-          link="/dzieciece/obuwie"
-        />
+        <CategorySquare imageSrc="/shoe.png" text="Shoes" link="/kids/shoes" />
         <CategorySquare
           imageSrc="/bag.png"
-          text="Torby i plecaki"
-          link="/dzieciece/torby"
+          text="Bags and backpacks"
+          link="/kids/bags"
         />
         <CategorySquare
           imageSrc="/trousers.png"
-          text="Spodnie"
-          link="/dzieciece/spodnie"
+          text="Trousers"
+          link="/kids/trousers"
         />
         <CategorySquare
           imageSrc="/pyjamas.png"
-          text="Piżamy"
-          link="/dzieciece/pizamy"
+          text="Pyjamas"
+          link="/kids/pyjamas"
         />
         <CategorySquare
           imageSrc="/shirt.png"
-          text="Koszulki"
-          link="/dzieciece/koszulki"
+          text="Shirts"
+          link="/kids/shirts"
         />
         <CategorySquare
           imageSrc="/jacket.png"
-          text="Kurtki"
-          link="/dzieciece/kurtki"
+          text="Jackets"
+          link="/kids/jackets"
         />
       </div>
     </div>

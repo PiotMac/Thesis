@@ -20,7 +20,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
     },
   });
 
-  const filters = ["Rozmiar", "Cena", "Marka", "Kolor", "Materiał"];
+  const filters = ["Size", "Price", "Brand", "Color", "Material"];
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("");
@@ -223,7 +223,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
 
   const renderDrawerContent = () => {
     switch (selectedFilter) {
-      case "Materiał":
+      case "Material":
         return (
           <List>
             {filterData.materials.map((material, index) => (
@@ -249,7 +249,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             ))}
           </List>
         );
-      case "Rozmiar":
+      case "Size":
         return (
           <List>
             {filterData.sizes.map((size, index) => (
@@ -276,7 +276,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             ))}
           </List>
         );
-      case "Cena":
+      case "Price":
         return (
           <Box
             sx={{
@@ -335,7 +335,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             </Box>
           </Box>
         );
-      case "Marka":
+      case "Brands":
         return (
           <List>
             {filterData.brands.map((brand, index) => (
@@ -361,7 +361,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             ))}
           </List>
         );
-      case "Kolor":
+      case "Color":
         return (
           <List
             style={{
@@ -418,7 +418,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
         className="filter"
         onClick={() => filterProducts()}
       >
-        Filtruj
+        Filter
       </button>
       <button
         id="reset_button"

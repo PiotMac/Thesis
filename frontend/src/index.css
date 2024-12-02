@@ -196,7 +196,7 @@ footer {
   border-radius: 8px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
   padding: 40px;
-  width: 320px;
+  width: 360px;
   gap: 20px;
 }
 
@@ -231,7 +231,7 @@ footer {
 }
 
 .login-button, .register-button {
-  width: 100%;
+  width: 60%;
   padding: 12px;
   background-color: var(--navbar-color);
   border: none;
@@ -409,7 +409,7 @@ footer {
 .profile-input-group label {
   max-width: 100%;
   margin-bottom: 5px;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: bold;
   color: var(--text-color);
 }
@@ -713,6 +713,20 @@ footer {
   gap: 40px;
 }
 
+.empty-cart-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.empty-cart-container h1 {
+  background-color: var(--navbar-color);
+  padding: 20px;
+  border-radius: 10px;
+  border: black solid 5px;
+  color: gold;
+}
+
 .cart-product-list {
   width: 65%;
   display: flex;
@@ -844,4 +858,95 @@ footer {
   flex-direction: row;
   gap: 20px;
   align-items: center;
+}
+
+.pay-page-container {
+  display: grid;
+  grid-template-areas: 
+    "paypageproductlist paypageuserdata";
+  flex-direction: row;
+  padding: 30px;
+  row-gap: 30px;
+  column-gap: 100px;
+  justify-content: center;
+}
+
+.pay-page-product-list {
+  grid-area: paypageproductlist;
+  width: 100%;
+}
+
+#your-order-header, #personal-info-header {
+  text-align: center;
+  color: white;
+}
+
+.pay-page-user-data-container {
+  grid-area: paypageuserdata;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  height: fit-content;
+  gap: 30px;
+}
+
+.pay-page-user-data {
+  display: grid;
+  gap: 30px;
+  background-color: gold;
+  border: black solid 5px;
+  border-radius: 10px;
+  padding: 20px;
+  justify-items: center;
+}
+
+.pay-page-user-data label {
+  color: black;
+}
+
+.pay-page-user-data input {
+  border-radius: 10px;
+  height: 30px;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.pay-button-box {
+  background-color: gold;
+  border: black solid 5px;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+#summary-pay {
+  color: white;
+  text-align: center;
+}
+
+#total-pay-price {
+  text-align: right;
+}
+
+.paying-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+#complete-button {
+  width: 70%;
+  font-size: 25px;
+  font-family: inherit;
+  background-color: var(--navbar-color);
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  font-weight: bold;
+}
+
+#complete-button:hover {
+  transform: scale(1.1);
 }

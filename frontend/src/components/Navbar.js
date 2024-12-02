@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -21,7 +21,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
             to="/"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
-            Kobiety
+            Women
           </NavLink>
         </li>
         <li>
@@ -29,7 +29,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
             to="/men"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
-            Mężczyźni
+            Men
           </NavLink>
         </li>
         <li>
@@ -37,7 +37,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
             to="/kids"
             className={({ isActive }) => (isActive ? "active-link" : "")}
           >
-            Dzieci
+            Kids
           </NavLink>
         </li>
       </ul>
@@ -56,17 +56,17 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/profile">Profil</NavLink>
+              <NavLink to="/profile">Profile</NavLink>
             </li>
             <li>
               <NavLink to="/login" onClick={handleLogout}>
-                Wyloguj się
+                Logout
               </NavLink>
             </li>
           </>
         ) : (
           <li>
-            <NavLink to="/login">Zaloguj się</NavLink>
+            <NavLink to="/login">Login</NavLink>
           </li>
         )}
       </ul>

@@ -2,17 +2,31 @@ import React, { useEffect, useState } from "react";
 import CartProduct from "./CartProduct";
 import { useNavigate } from "react-router-dom";
 import { List, ListItem, ListItemText } from "@mui/material";
+import { jwtDecode } from "jwt-decode";
 
-const CartPage = () => {
+const CartPage = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     const fetchAllItems = async () => {
       const token = localStorage.getItem("token");
 
-      if (!token) {
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
         navigate("/login");
         return;
       }
@@ -67,7 +81,8 @@ const CartPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
         navigate("/login");
         return;
       }
@@ -111,7 +126,8 @@ const CartPage = () => {
   const deleteProduct = async (cart_id, currentQuantity, itemPrice) => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
         navigate("/login");
         return;
       }
@@ -141,28 +157,47 @@ const CartPage = () => {
     }
   };
 
+  const payForProducts = async () => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
+    navigate("/checkout", { state: { cartItems } });
+  };
+
   return (
     <div className="cart-page-container">
-      <div className="cart-product-list">
-        {cartItems.map((item) => (
-          <CartProduct
-            key={item.cart_id}
-            item={item}
-            onEdit={editProduct}
-            onDelete={deleteProduct}
-          />
-        ))}
-      </div>
-      <div className="cart-price-button-container">
-        <h1>Podsumowanie</h1>
-        <div className="price-sum-container">
-          <h2>Łącznie: </h2>
-          <h2 id="total-price-header">{totalPrice.toFixed(2)}zł</h2>
+      {cartItems.length === 0 ? (
+        <div className="empty-cart-container">
+          <h1>Your cart is empty!</h1>
         </div>
-        <div className="pay-button-container">
-          <button>Zapłać</button>
-        </div>
-      </div>
+      ) : (
+        <>
+          <div className="cart-product-list">
+            {cartItems.map((item) => (
+              <CartProduct
+                key={item.cart_id}
+                item={item}
+                onEdit={editProduct}
+                onDelete={deleteProduct}
+                showButtons={true}
+              />
+            ))}
+          </div>
+          <div className="cart-price-button-container">
+            <h1>Summary</h1>
+            <div className="price-sum-container">
+              <h2>Total: </h2>
+              <h2 id="total-price-header">{totalPrice.toFixed(2)}$</h2>
+            </div>
+            <div className="pay-button-container">
+              <button onClick={payForProducts}>Pay</button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

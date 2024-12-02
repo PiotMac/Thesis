@@ -204,7 +204,7 @@ const ProductPage = () => {
       <div className="product-info-container">
         <div className="product-info">
           <h1 id="product-brand">{productData.brand}</h1>
-          <h1 id="product-price">{productData.price}zł</h1>
+          <h1 id="product-price">{productData.price.toFixed(2)}$</h1>
         </div>
       </div>
       <div className="product-filters">

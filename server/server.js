@@ -290,8 +290,9 @@ app.get("/cart", authenticateToken, (req, res) => {
       p.price, 
       p.material, 
       p.description, 
-      p.brand, 
-      i.color_id, 
+      p.brand,
+      i.id AS inventory_id,
+      i.color_id,
       i.size_id, 
       i.quantity AS inventory_quantity, 
       c.quantity * p.price AS total_price, 
@@ -366,6 +367,90 @@ app.delete("/cart", authenticateToken, (req, res) => {
         .json({ error: "Database error during cart product deletion!" });
     }
     return res.json({ success: true, message: "Cart product deleted!" });
+  });
+});
+
+// Endpoint to complete a transaction
+app.post("/checkout", authenticateToken, (req, res) => {
+  const user_id = req.user.userId;
+  const date = new Date();
+  const formattedDate = date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+
+  const insertTransactionQuery = `INSERT INTO Transactions (user_id, transaction_date) VALUES (?, ?)`;
+  db.query(insertTransactionQuery, [user_id, formattedDate], (err, result) => {
+    if (err) {
+      console.error("Transaction insertion error: ", err);
+      return res.status(500).json({ error: "Transaction insertion error" });
+    }
+
+    const transactionId = result.insertId;
+    const cartItems = req.body.cartItems;
+
+    const insertProductsQuery = `INSERT INTO TransactionsItems 
+    (transaction_id, inventory_id, quantity) VALUES ?`;
+
+    const insertValues = cartItems.map((item) => [
+      transactionId,
+      item.inventory_id,
+      item.quantity,
+    ]);
+
+    db.query(insertProductsQuery, [insertValues], (err) => {
+      if (err) {
+        console.error("TransactionsItems insertion error: ", err);
+        return res
+          .status(500)
+          .json({ error: "TransactionsItems insertion error" });
+      }
+
+      // Now update the Inventory for each cartItem
+      const updateInventoryQueries = cartItems.map((item) => {
+        const updateInventoryQuery = `
+          UPDATE Inventory 
+          SET quantity = quantity - ? 
+          WHERE id = ?`;
+
+        return new Promise((resolve, reject) => {
+          db.query(
+            updateInventoryQuery,
+            [item.quantity, item.inventory_id],
+            (err, result) => {
+              if (err) {
+                console.error("Inventory update error: ", err);
+                return reject(err);
+              }
+              resolve(result);
+            }
+          );
+        });
+      });
+
+      // Execute all inventory updates in parallel
+      Promise.all(updateInventoryQueries)
+        .then(() => {
+          // After inventory is updated, delete rows from Carts where user_id matches
+          const deleteCartItemsQuery = `DELETE FROM Carts WHERE user_id = ?`;
+
+          db.query(deleteCartItemsQuery, [user_id], (err) => {
+            if (err) {
+              console.error("Error deleting cart items:", err);
+              return res
+                .status(500)
+                .json({ error: "Error deleting cart items" });
+            }
+
+            // If everything is successful, send a success response
+            return res.status(200).json({
+              message:
+                "Transaction completed, inventory updated, and cart emptied!",
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Error updating inventory:", error);
+          return res.status(500).json({ error: "Error updating inventory" });
+        });
+    });
   });
 });
 
@@ -485,20 +570,23 @@ app.post("/products/:product_id", authenticateToken, (req, res) => {
 app.get("/:mainCategory/:subcategory/:subsubcategory?", (req, res) => {
   const { mainCategory, subcategory, subsubcategory } = req.params;
 
-  let wrappedCategory = "";
-  switch (mainCategory) {
-    case "damskie":
-      wrappedCategory = "Women";
-      break;
-    case "meskie":
-      wrappedCategory = "Men";
-      break;
-    case "dzieciece":
-      wrappedCategory = "Kids";
-      break;
-    default:
-      res.status(500).send("Error fetching category!");
-  }
+  let wrappedCategory =
+    mainCategory.charAt(0).toUpperCase() + mainCategory.slice(1);
+
+  // let wrappedCategory = "";
+  // switch (mainCategory) {
+  //   case "damskie":
+  //     wrappedCategory = "Women";
+  //     break;
+  //   case "meskie":
+  //     wrappedCategory = "Men";
+  //     break;
+  //   case "dzieciece":
+  //     wrappedCategory = "Kids";
+  //     break;
+  //   default:
+  //     res.status(500).send("Error fetching category!");
+  // }
 
   // Get all the subcategories for the page
   const query = `SELECT S.subcategory_id, S.name

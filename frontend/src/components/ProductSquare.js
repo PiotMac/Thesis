@@ -22,7 +22,7 @@ const ProductSquare = ({
       <h2>{name}</h2>
       <h3>{brand}</h3>
       <img src={imgSrc} alt={name} />
-      <p>{price}zł</p>
+      <p>{price}$</p>
       {/* <p>
         <strong>Price:</strong> ${price}
       </p>

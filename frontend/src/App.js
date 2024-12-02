@@ -12,6 +12,7 @@ import UserProfile from "./components/UserProfile";
 import CategoryPage from "./components/CategoryPage";
 import ProductPage from "./components/ProductPage";
 import CartPage from "./components/CartPage";
+import CartPayPage from "./components/CartPayPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,7 +33,7 @@ function App() {
     };
 
     checkToken();
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <div className="app">
@@ -55,13 +56,23 @@ function App() {
                 path="/register"
                 element={<Register setIsLoggedIn={setIsLoggedIn} />}
               />
-              <Route path="/profile" element={<UserProfile />} />
+              <Route
+                path="/profile"
+                element={<UserProfile setIsLoggedIn={setIsLoggedIn} />}
+              />
               <Route
                 path="/:mainCategory/:subcategory/:subsubcategory?"
                 element={<CategoryPage />}
               />
               <Route path="/products/:product_id" element={<ProductPage />} />
-              <Route path="/cart" element={<CartPage />} />
+              <Route
+                path="/checkout"
+                element={<CartPayPage setIsLoggedIn={setIsLoggedIn} />}
+              />
+              <Route
+                path="/cart"
+                element={<CartPage setIsLoggedIn={setIsLoggedIn} />}
+              />
             </Routes>
           </div>
           <Footer />

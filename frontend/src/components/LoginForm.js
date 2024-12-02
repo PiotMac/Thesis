@@ -72,10 +72,10 @@ const LoginForm = ({ setIsLoggedIn }) => {
         {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
 
         <button type="submit" className="login-button">
-          Zaloguj się
+          Log in
         </button>
         <NavLink id="register_in_log" to="/register">
-          Nie jesteś zarejestrowany? Załóż konto!
+          You are not registered? Create an account!
         </NavLink>
       </form>
     </div>

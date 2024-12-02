@@ -5,35 +5,27 @@ const Men = () => {
   return (
     <div className="app">
       <div className="categories_grid">
-        <CategorySquare
-          imageSrc="/shoe.png"
-          text="Obuwie"
-          link="/meskie/obuwie"
-        />
+        <CategorySquare imageSrc="/shoe.png" text="Shoes" link="/men/shoes" />
         <CategorySquare
           imageSrc="/bag.png"
-          text="Torby i plecaki"
-          link="/meskie/torby"
+          text="Bags and backpacks"
+          link="/men/bags"
         />
         <CategorySquare
           imageSrc="/trousers.png"
-          text="Spodnie"
-          link="/meskie/spodnie"
+          text="Trousers"
+          link="/men/trousers"
         />
-        <CategorySquare
-          imageSrc="/suit.png"
-          text="Garnitury"
-          link="/meskie/garnitury"
-        />
+        <CategorySquare imageSrc="/suit.png" text="Suits" link="/men/suits" />
         <CategorySquare
           imageSrc="/shirt.png"
-          text="Koszulki"
-          link="/meskie/koszulki"
+          text="Shirts"
+          link="/men/shirts"
         />
         <CategorySquare
           imageSrc="/jacket.png"
-          text="Kurtki"
-          link="/meskie/kurtki"
+          text="Jackets"
+          link="/men/jackets"
         />
       </div>
     </div>

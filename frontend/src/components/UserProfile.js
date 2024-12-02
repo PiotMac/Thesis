@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-function UserProfile() {
+function UserProfile({ setIsLoggedIn }) {
+  const navigate = useNavigate();
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return false;
+    }
+  };
+
   // Stan dla danych użytkownika
   const [userData, setUserData] = useState({
     firstName: "",
@@ -16,7 +31,6 @@ function UserProfile() {
     zipcode: "",
   });
 
-  const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -44,7 +58,11 @@ function UserProfile() {
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
-
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
+        navigate("/login");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:4000/profile", {
           method: "GET",
@@ -152,6 +170,11 @@ function UserProfile() {
   const saveNewBasicInfo = async () => {
     if (validateBasicInfo()) {
       const token = localStorage.getItem("token");
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
+        navigate("/login");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:4000/profile", {
           method: "PUT",
@@ -181,6 +204,11 @@ function UserProfile() {
   const saveNewAddress = async () => {
     if (validateAddressChange()) {
       const token = localStorage.getItem("token");
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
+        navigate("/login");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:4000/profile", {
           method: "PUT",
@@ -215,6 +243,11 @@ function UserProfile() {
   const saveNewPassword = async () => {
     if (validatePasswordChange()) {
       const token = localStorage.getItem("token");
+      if (!isTokenValid(token)) {
+        setIsLoggedIn(false);
+        navigate("/login");
+        return;
+      }
       try {
         const response = await fetch("http://localhost:4000/profile", {
           method: "PUT",
@@ -256,10 +289,11 @@ function UserProfile() {
 
   return (
     <div className="profile-container">
-      <h2>Profil użytkownika</h2>
+      <h2>User's profile</h2>
       <div className="profile-basic-info">
-        <h3>Zmień informacje o koncie</h3>
+        <h3>Modify profile's data</h3>
         <div className="profile-input-group">
+          <label>Email</label>
           <input
             type="email"
             name="email"
@@ -269,33 +303,35 @@ function UserProfile() {
           />
         </div>
         <div className="profile-input-group">
+          <label>Name</label>
           <input
             type="text"
             name="firstName"
             value={userData.firstName}
-            placeholder="Imię"
+            placeholder="Name"
             onChange={handleInputChange}
           />
         </div>
 
         <div className="profile-input-group">
+          <label>Surname</label>
           <input
             type="text"
             name="lastName"
             value={userData.lastName}
-            placeholder="Nazwisko"
+            placeholder="Surname"
             onChange={handleInputChange}
           />
         </div>
       </div>
 
       <div className="profile-password">
-        <h3>Zmień hasło</h3>
+        <h3>Change password</h3>
         <div className="profile-input-group">
           <input
             type="password"
             name="current_password"
-            placeholder="Aktualne hasło"
+            placeholder="Current password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
@@ -304,7 +340,7 @@ function UserProfile() {
           <input
             type="password"
             name="new_password"
-            placeholder="Nowe hasło"
+            placeholder="New password"
             value={password}
             onChange={handlePasswordCriteria}
           />
@@ -335,7 +371,7 @@ function UserProfile() {
           <input
             type="password"
             name="new_password_again"
-            placeholder="Potwierdź nowe hasło"
+            placeholder="Confirm your password"
             value={repeatPassword}
             onChange={(e) => setRepeatPassword(e.target.value)}
           />
@@ -343,61 +379,66 @@ function UserProfile() {
       </div>
 
       <div className="profile-address">
-        <h3>Zmień adres</h3>
+        <h3>Change adress</h3>
         <div className="profile-input-group">
+          <label>Street</label>
           <input
             type="text"
             name="street"
             value={userData.street}
-            placeholder="Ulica"
+            placeholder="Street"
             onChange={handleInputChange}
           />
         </div>
         <div className="profile-input-group">
+          <label>House number</label>
           <input
             type="text"
             name="house_nr"
             value={userData.house_nr}
-            placeholder="Nr domu"
+            placeholder="House number"
             onChange={handleInputChange}
           />
         </div>
         <div className="profile-input-group">
+          <label>Appartment number</label>
           <input
             type="text"
             name="appartment_nr"
             value={userData.appartment_nr}
-            placeholder="Nr lokalu"
+            placeholder="Appartment number"
             onChange={handleInputChange}
           />
         </div>
         <div className="profile-input-group">
+          <label>City</label>
           <input
             type="text"
             name="city"
             value={userData.city}
             onChange={handleInputChange}
-            placeholder="Miasto"
+            placeholder="City"
           />
         </div>
         <div className="profile-input-group">
+          <label>Zip code</label>
           <input
             type="text"
             name="zipcode"
             value={userData.zipcode}
-            placeholder="Kod pocztowy"
+            placeholder="Postal code"
             onChange={handleInputChange}
           />
         </div>
       </div>
       <button id="button-info" onClick={saveNewBasicInfo}>
-        Zapisz zmiany
+        Save changes
       </button>
       <button id="button-password" onClick={saveNewPassword}>
-        Zapisz zmiany
+        Save changes
       </button>
       <button id="button-address" onClick={saveNewAddress}>
-        Zapisz zmiany
+        Save changes
       </button>
     </div>
   );

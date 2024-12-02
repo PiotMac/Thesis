@@ -78,7 +78,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
   return (
     <div className="register-container">
       <form onSubmit={handleSubmit} className="register-form">
-        <h2 className="register-title">Rejestracja</h2>
+        <h2 className="register-title">Registration</h2>
 
         <div className="input-group">
           <label htmlFor="name">Name</label>
@@ -88,7 +88,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="Wpisz swoje imię"
+            placeholder="Enter your name"
           />
         </div>
 
@@ -100,7 +100,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            placeholder="Wpisz swój adres email"
+            placeholder="Enter your email"
           />
         </div>
 
@@ -112,7 +112,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
             value={password}
             onChange={handlePasswordCriteria}
             required
-            placeholder="Wpisz swoje hasło"
+            placeholder="Enter your password"
           />
         </div>
 
@@ -123,7 +123,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
             value={repeatPassword}
             onChange={(e) => setRepeatPassword(e.target.value)}
             required
-            placeholder="Wpisz ponownie swoje hasło"
+            placeholder="Enter your password again"
           />
         </div>
 
@@ -153,7 +153,7 @@ const RegisterForm = ({ setIsLoggedIn }) => {
         </div>
 
         <button type="submit" className="register-button">
-          Załóż konto
+          Register
         </button>
       </form>
     </div>

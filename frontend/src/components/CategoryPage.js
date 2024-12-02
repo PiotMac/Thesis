@@ -13,15 +13,15 @@ const CategoryPage = () => {
   const [imagePath, setImagePath] = useState("");
 
   const imageMap = {
-    obuwie: "/shoe.png",
-    koszulki: "/shirt.png",
-    spodnie: "/trousers.png",
-    kurtki: "/jacket.png",
-    sukienki: "/dress.png",
-    torebki: "/women_bag.png",
-    torby: "/bag.png",
-    pizamy: "/pyjamas.png",
-    garnitury: "/suit.png",
+    shoes: "/shoe.png",
+    shirts: "/shirt.png",
+    trousers: "/trousers.png",
+    jackets: "/jacket.png",
+    dresses: "/dress.png",
+    handbags: "/women_bag.png",
+    bags: "/bag.png",
+    pyjamas: "/pyjamas.png",
+    suits: "/suit.png",
   };
 
   const navigate = useNavigate();
@@ -97,7 +97,7 @@ const CategoryPage = () => {
       </div>
       <div className="subcategories_nav_container">
         <div className="subcategories_nav">
-          <h1>Kategorie</h1>
+          <h1>Categories</h1>
           <ul className="subcategories_list">
             {subcategories.map((name, index) => (
               <li
