@@ -375,82 +375,167 @@ app.post("/checkout", authenticateToken, (req, res) => {
   const user_id = req.user.userId;
   const date = new Date();
   const formattedDate = date.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+  const total = req.body.totalPrice;
 
-  const insertTransactionQuery = `INSERT INTO Transactions (user_id, transaction_date) VALUES (?, ?)`;
-  db.query(insertTransactionQuery, [user_id, formattedDate], (err, result) => {
-    if (err) {
-      console.error("Transaction insertion error: ", err);
-      return res.status(500).json({ error: "Transaction insertion error" });
-    }
-
-    const transactionId = result.insertId;
-    const cartItems = req.body.cartItems;
-
-    const insertProductsQuery = `INSERT INTO TransactionsItems 
-    (transaction_id, inventory_id, quantity) VALUES ?`;
-
-    const insertValues = cartItems.map((item) => [
-      transactionId,
-      item.inventory_id,
-      item.quantity,
-    ]);
-
-    db.query(insertProductsQuery, [insertValues], (err) => {
+  const insertTransactionQuery = `INSERT INTO Transactions (user_id, transaction_date, total_price) VALUES (?, ?, ?)`;
+  db.query(
+    insertTransactionQuery,
+    [user_id, formattedDate, total],
+    (err, result) => {
       if (err) {
-        console.error("TransactionsItems insertion error: ", err);
-        return res
-          .status(500)
-          .json({ error: "TransactionsItems insertion error" });
+        console.error("Transaction insertion error: ", err);
+        return res.status(500).json({ error: "Transaction insertion error" });
       }
 
-      // Now update the Inventory for each cartItem
-      const updateInventoryQueries = cartItems.map((item) => {
-        const updateInventoryQuery = `
+      const transactionId = result.insertId;
+      const cartItems = req.body.cartItems;
+
+      const insertProductsQuery = `INSERT INTO TransactionsItems 
+    (transaction_id, inventory_id, quantity) VALUES ?`;
+
+      const insertValues = cartItems.map((item) => [
+        transactionId,
+        item.inventory_id,
+        item.quantity,
+      ]);
+
+      db.query(insertProductsQuery, [insertValues], (err) => {
+        if (err) {
+          console.error("TransactionsItems insertion error: ", err);
+          return res
+            .status(500)
+            .json({ error: "TransactionsItems insertion error" });
+        }
+
+        // Now update the Inventory for each cartItem
+        const updateInventoryQueries = cartItems.map((item) => {
+          const updateInventoryQuery = `
           UPDATE Inventory 
           SET quantity = quantity - ? 
           WHERE id = ?`;
 
-        return new Promise((resolve, reject) => {
-          db.query(
-            updateInventoryQuery,
-            [item.quantity, item.inventory_id],
-            (err, result) => {
-              if (err) {
-                console.error("Inventory update error: ", err);
-                return reject(err);
+          return new Promise((resolve, reject) => {
+            db.query(
+              updateInventoryQuery,
+              [item.quantity, item.inventory_id],
+              (err, result) => {
+                if (err) {
+                  console.error("Inventory update error: ", err);
+                  return reject(err);
+                }
+                resolve(result);
               }
-              resolve(result);
-            }
-          );
-        });
-      });
-
-      // Execute all inventory updates in parallel
-      Promise.all(updateInventoryQueries)
-        .then(() => {
-          // After inventory is updated, delete rows from Carts where user_id matches
-          const deleteCartItemsQuery = `DELETE FROM Carts WHERE user_id = ?`;
-
-          db.query(deleteCartItemsQuery, [user_id], (err) => {
-            if (err) {
-              console.error("Error deleting cart items:", err);
-              return res
-                .status(500)
-                .json({ error: "Error deleting cart items" });
-            }
-
-            // If everything is successful, send a success response
-            return res.status(200).json({
-              message:
-                "Transaction completed, inventory updated, and cart emptied!",
-            });
+            );
           });
-        })
-        .catch((error) => {
-          console.error("Error updating inventory:", error);
-          return res.status(500).json({ error: "Error updating inventory" });
         });
-    });
+
+        // Execute all inventory updates in parallel
+        Promise.all(updateInventoryQueries)
+          .then(() => {
+            // After inventory is updated, delete rows from Carts where user_id matches
+            const deleteCartItemsQuery = `DELETE FROM Carts WHERE user_id = ?`;
+
+            db.query(deleteCartItemsQuery, [user_id], (err) => {
+              if (err) {
+                console.error("Error deleting cart items:", err);
+                return res
+                  .status(500)
+                  .json({ error: "Error deleting cart items" });
+              }
+
+              // If everything is successful, send a success response
+              return res.status(200).json({
+                message:
+                  "Transaction completed, inventory updated, and cart emptied!",
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("Error updating inventory:", error);
+            return res.status(500).json({ error: "Error updating inventory" });
+          });
+      });
+    }
+  );
+});
+
+// Endpoint to fetch all user's transactions
+app.get("/transactions", authenticateToken, (req, res) => {
+  const user_id = req.user.userId;
+
+  const fetchAllTransactionsQuery = `SELECT 
+  t.transaction_id,
+  t.transaction_date,
+  t.total_price,
+  ti.inventory_id,
+  ti.quantity AS transaction_quantity,
+  i.product_id,
+  i.quantity AS inventory_quantity,
+  p.name AS product_name,
+  p.brand AS product_brand,
+  p.price AS product_price,
+  c.red,
+  c.green,
+  c.blue,
+  s.name AS size_name,
+  s.type AS size_type
+FROM 
+  Transactions t
+JOIN 
+  TransactionsItems ti ON t.transaction_id = ti.transaction_id
+JOIN 
+  Inventory i ON ti.inventory_id = i.id
+JOIN 
+  Products p ON i.product_id = p.product_id
+JOIN 
+  Colors c ON i.color_id = c.color_id
+JOIN 
+  Sizes s ON i.size_id = s.size_id
+WHERE 
+  t.user_id = ?`;
+  db.query(fetchAllTransactionsQuery, [user_id], (err, transactions) => {
+    if (err) {
+      console.error("Error fetching transaction ids:", err);
+      return res.status(500).json({ error: "Error fetching transaction ids" });
+    }
+
+    const groupedTransactions = transactions.reduce((acc, transaction) => {
+      const { transaction_id } = transaction;
+
+      // Initialize transaction group if it doesn't exist
+      if (!acc[transaction_id]) {
+        acc[transaction_id] = {
+          transaction_id,
+          transaction_date: transaction.transaction_date,
+          total_price: transaction.total_price,
+          items: [],
+        };
+      }
+
+      // Create and add item to the transaction
+      const item = {
+        inventory_id: transaction.inventory_id,
+        transaction_quantity: transaction.transaction_quantity,
+        inventory_quantity: transaction.inventory_quantity,
+        product: {
+          product_id: transaction.product_id,
+          name: transaction.product_name,
+          brand: transaction.product_brand,
+          price: transaction.product_price,
+          color: {
+            red: transaction.red,
+            green: transaction.green,
+            blue: transaction.blue,
+          },
+          size: { name: transaction.size_name, type: transaction.size_type },
+        },
+      };
+
+      acc[transaction_id].items.push(item);
+      return acc;
+    }, {});
+
+    res.json(groupedTransactions);
   });
 });
 

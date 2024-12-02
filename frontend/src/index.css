@@ -120,40 +120,47 @@ nav h1 {
   margin: 0;
 }
 
-nav ul {
-  list-style: none;
-  display: flex;
-}
-
-nav #left-nav {
+#left-nav {
+  width: 30%;
   margin-left: 0px;
+  display: flex;
+  gap: 60px;
+  flex-direction: row;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
-nav #right-nav {
+#left-nav a, #right-nav a {
+  font-size: calc(1em + 1vw);
+}
+
+#right-nav {
   margin-right: 20px;
+  width: 30%;
+  display: flex;
+  gap: 60px;
+  flex-direction: row;
+  padding: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
-nav li {
-  margin-left: 8px;
-  margin-right: 8px;
-  align-content: center;
-}
-
-nav ul li a {
+nav a {
   color: white;
   text-decoration: none;
   font-size: 18px;
 }
 
-nav ul li a:hover {
+nav a:hover {
   font-weight: bold;
   cursor: pointer;
 }
 
 .active-link {
   font-weight: bold;
-  color: var(--navbar-color);
-  border-bottom: 2px solid var(--navbar-color);
+  color: gold;
+  text-decoration: underline;
 }
 
 .product-list {
@@ -288,7 +295,7 @@ footer {
 .profile-container {
   display: grid;
   grid-template-areas:
-    "header header header"
+    "header header transaction-button"
     "profile-basic-info profile-password-info profile-address-info"
     "profile-basic-info profile-password-info profile-address-info"
     "button-info button-password button-address";
@@ -361,12 +368,10 @@ footer {
   color: gold;
 }
 
-.profile-container h2 {
-  grid-column-start: 1;
-  grid-column-end: 4;
+#profile-user-header {
+  grid-area: header;
   color: var(--text-color);
-  font-size: 60px;
-  margin: 0;
+  font-size: 200%;
 }
 
 .profile-container label {
@@ -713,13 +718,13 @@ footer {
   gap: 40px;
 }
 
-.empty-cart-container {
+.empty-cart-container, .empty-transactions-container {
   width: 100%;
   display: flex;
   justify-content: center;
 }
 
-.empty-cart-container h1 {
+.empty-cart-container h1, .empty-transactions-container h1 {
   background-color: var(--navbar-color);
   padding: 20px;
   border-radius: 10px;
@@ -732,6 +737,80 @@ footer {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.transaction-page-container {
+  display: flex;
+  justify-content: center;
+}
+
+.transaction-list-container {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.transaction-all-container {
+  background-color: gold;
+  border-radius: 30px;
+  border: black solid 10px;
+  padding: 20px;
+}
+
+.transaction-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.transaction-item {
+  background-color: var(--navbar-color);
+  border-radius: 10px;
+  border: black solid 5px;
+  padding: 10px;
+}
+
+.transaction-item h1 {
+  color: white;
+  text-align: center;
+}
+
+#color-transaction-product-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: fit-content;
+  align-items: center;
+}
+
+.transaction-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+
+.transaction-headers-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+#transaction-item-brand {
+  text-align: center;
+  margin-top: 0;
+}
+
+.transaction-headers {
+  text-align: center;
+  width: fit-content;
+  background-color: orangered;
+  border-radius: 10px;
+  padding: 20px;
+  border: black solid 5px;
 }
 
 .cart-price-button-container {
@@ -949,4 +1028,12 @@ footer {
 
 #complete-button:hover {
   transform: scale(1.1);
+}
+
+#transaction-history-button {
+  grid-area: transaction-button;
+  width: 60%;
+  font-family: inherit;
+  font-weight: bold;
+  font-size: 200%;
 }

@@ -335,7 +335,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             </Box>
           </Box>
         );
-      case "Brands":
+      case "Brand":
         return (
           <List>
             {filterData.brands.map((brand, index) => (

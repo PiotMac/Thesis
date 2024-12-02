@@ -227,6 +227,7 @@ const CartPayPage = ({ setIsLoggedIn }) => {
         },
         body: JSON.stringify({
           cartItems: cartItems,
+          totalPrice: totalPriceOfProducts.toFixed(2),
         }),
       });
 

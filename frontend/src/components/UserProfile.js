@@ -287,9 +287,16 @@ function UserProfile({ setIsLoggedIn }) {
     }
   };
 
+  const goToTransactions = () => {
+    navigate("/transactions");
+  };
+
   return (
     <div className="profile-container">
-      <h2>User's profile</h2>
+      <h1 id="profile-user-header">User's profile</h1>
+      <button id="transaction-history-button" onClick={goToTransactions}>
+        Transaction history
+      </button>
       <div className="profile-basic-info">
         <h3>Modify profile's data</h3>
         <div className="profile-input-group">

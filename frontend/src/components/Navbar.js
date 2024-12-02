@@ -15,61 +15,66 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
 
   return (
     <nav id="main-nav">
-      <ul id="left-nav">
-        <li>
-          <NavLink
-            to="/"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-          >
-            Women
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/men"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-          >
-            Men
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/kids"
-            className={({ isActive }) => (isActive ? "active-link" : "")}
-          >
-            Kids
-          </NavLink>
-        </li>
-      </ul>
-      <ul id="right-nav">
+      <div id="left-nav">
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "active-link" : "")}
+        >
+          Women
+        </NavLink>
+        <NavLink
+          to="/men"
+          className={({ isActive }) => (isActive ? "active-link" : "")}
+        >
+          Men
+        </NavLink>
+        <NavLink
+          to="/kids"
+          className={({ isActive }) => (isActive ? "active-link" : "")}
+        >
+          Kids
+        </NavLink>
+      </div>
+      <div id="right-nav">
         {isLoggedIn ? (
           <>
-            <li>
-              <NavLink to="/cart">
-                <IconButton
-                  id="shopping_cart"
-                  sx={{ color: "#8E05C2" }}
-                  aria-label="add to shopping cart"
-                >
-                  <AddShoppingCartIcon />
-                </IconButton>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/profile">Profile</NavLink>
-            </li>
-            <li>
-              <NavLink to="/login" onClick={handleLogout}>
-                Logout
-              </NavLink>
-            </li>
+            <NavLink to="/cart">
+              <IconButton
+                id="shopping_cart"
+                sx={{
+                  color: "gold",
+                  fontSize: "inherit",
+                  padding: "10px",
+                  height: "auto",
+                }}
+                aria-label="add to shopping cart"
+              >
+                <AddShoppingCartIcon />
+              </IconButton>
+            </NavLink>
+            <NavLink
+              to="/profile"
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
+              Profile
+            </NavLink>
+            <NavLink
+              to="/login"
+              onClick={handleLogout}
+              className={({ isActive }) => (isActive ? "active-link" : "")}
+            >
+              Logout
+            </NavLink>
           </>
         ) : (
-          <li>
-            <NavLink to="/login">Login</NavLink>
-          </li>
+          <NavLink
+            to="/login"
+            className={({ isActive }) => (isActive ? "active-link" : "")}
+          >
+            Login
+          </NavLink>
         )}
-      </ul>
+      </div>
     </nav>
   );
 };
