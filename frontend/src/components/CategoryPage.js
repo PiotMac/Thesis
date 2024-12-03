@@ -92,6 +92,7 @@ const CategoryPage = () => {
           products={products}
           setProducts={setProducts}
           originalProducts={originalProducts}
+          setCurrentPage={setCurrentPage}
         />
       </div>
       <div className="products_container">

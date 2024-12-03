@@ -107,6 +107,218 @@ async function generateProducts() {
   let categories;
   let subcategories;
 
+  const clothingBrands = [
+    "Gucci",
+    "Louis Vuitton",
+    "Prada",
+    "Chanel",
+    "Burberry",
+    "Versace",
+    "Armani",
+    "Hermès",
+    "Ralph Lauren",
+    "Calvin Klein",
+    "Tommy Hilfiger",
+    "Hugo Boss",
+    "Zara",
+    "H&M",
+    "Uniqlo",
+    "Mango",
+    "Banana Republic",
+    "GAP",
+    "Levi's",
+    "Wrangler",
+    "Diesel",
+    "Dockers",
+    "J.Crew",
+    "Patagonia",
+    "The North Face",
+    "Balenciaga",
+    "Givenchy",
+    "Dior",
+    "Yves Saint Laurent (YSL)",
+    "Fendi",
+    "Bottega Veneta",
+    "Alexander McQueen",
+    "Off-White",
+    "Supreme",
+    "Palm Angels",
+    "Balmain",
+    "Kenzo",
+    "Stone Island",
+    "Carhartt WIP",
+    "Stüssy",
+    "A.P.C.",
+    "Acne Studios",
+    "Moncler",
+    "Canada Goose",
+    "Columbia",
+    "Champion",
+    "Fila",
+    "Superdry",
+    "Abercrombie & Fitch",
+    "Hollister",
+  ];
+
+  const shoeBrands = [
+    "Nike",
+    "Adidas",
+    "Puma",
+    "Reebok",
+    "New Balance",
+    "Asics",
+    "Under Armour",
+    "Skechers",
+    "Converse",
+    "Vans",
+    "Timberland",
+    "Dr. Martens",
+    "Clarks",
+    "Salomon",
+    "Merrell",
+    "Birkenstock",
+    "Crocs",
+    "UGG",
+    "Toms",
+    "Cole Haan",
+    "Johnston & Murphy",
+    "Allen Edmonds",
+    "Stuart Weitzman",
+    "Jimmy Choo",
+    "Christian Louboutin",
+    "Balenciaga",
+    "Alexander McQueen",
+    "Golden Goose",
+    "Saucony",
+    "Brooks",
+    "Hoka One One",
+    "On Running",
+    "Altra",
+    "Topo Athletic",
+    "Inov-8",
+    "La Sportiva",
+    "KEEN",
+    "ECCO",
+    "Geox",
+    "Mephisto",
+    "Rockport",
+    "Blundstone",
+    "Hunter",
+    "Sam Edelman",
+    "Steve Madden",
+    "Kenneth Cole",
+    "Aldo",
+    "Rieker",
+    "Pikolinos",
+    "Tory Burch",
+  ];
+
+  const clothingMaterials = [
+    "Cotton",
+    "Wool",
+    "Silk",
+    "Linen",
+    "Polyester",
+    "Nylon",
+    "Rayon",
+    "Acrylic",
+    "Spandex",
+    "Denim",
+    "Leather",
+    "Suede",
+    "Velvet",
+    "Cashmere",
+    "Chiffon",
+    "Organza",
+    "Taffeta",
+    "Tweed",
+    "Fleece",
+    "Hemp",
+    "Jersey",
+    "Corduroy",
+    "Satin",
+    "Canvas",
+    "Bamboo",
+    "Modal",
+    "Viscose",
+    "Lyocell",
+    "Chambray",
+    "Seersucker",
+    "Crepe",
+    "Georgette",
+    "Lace",
+    "Tulle",
+    "Merino Wool",
+    "Alpaca",
+    "Mohair",
+    "Angora",
+    "Microfiber",
+    "Velour",
+    "Neoprene",
+    "Pashmina",
+    "Terrycloth",
+    "Flannel",
+  ];
+
+  const shoeMaterials = [
+    "Leather",
+    "Suede",
+    "Canvas",
+    "Rubber",
+    "Mesh",
+    "Nylon",
+    "Polyester",
+    "Gore-Tex",
+    "PU Leather",
+    "Textile",
+    "Felt",
+    "Microfiber",
+    "Cotton",
+    "Denim",
+    "Wool",
+    "Satin",
+    "Velvet",
+    "PVC",
+    "EVA Foam",
+    "TPU",
+    "Latex",
+    "Memory Foam",
+    "Neoprene",
+    "Cork",
+    "Hemp",
+    "Plastic",
+    "Knitted Fabric",
+    "Flyknit",
+    "Cloth",
+    "Vinyl",
+    "Polyurethane",
+    "Pebbled Leather",
+    "Snake Leather",
+    "Crocodile Leather",
+    "Patent Leather",
+    "Nubuck",
+    "Thermoplastic Rubber",
+    "Carbon Fiber",
+    "Sheepskin",
+    "Faux Fur",
+    "Natural Rubber",
+    "Elastic",
+  ];
+
+  function pluralToSingular(categoryName) {
+    if (
+      categoryName === "trousers" ||
+      categoryName === "pyjamas" ||
+      categoryName === "shoes"
+    ) {
+    } else if (categoryName.endsWith("es")) {
+      categoryName = categoryName.slice(0, -2);
+    } else if (categoryName.endsWith("s")) {
+      categoryName = categoryName.slice(0, -1);
+    }
+    return categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+  }
+
   // Retrieving all categories
   try {
     const categoryRes = await getCategories();
@@ -114,8 +326,8 @@ async function generateProducts() {
       id: row.category_id,
       name: row.name,
       section: row.section,
+      type: row.type,
     }));
-    console.log("Categories loaded:", categories.length);
   } catch (err) {
     console.error("Error retrieving categories:", err);
     return; // Exit if there's an error with categories
@@ -123,11 +335,12 @@ async function generateProducts() {
 
   for (let i = 0; i < 1000; i++) {
     // Choosing random category
-    const category_id = Math.floor(Math.random() * categories.length + 1);
+    const randomCategory =
+      categories[Math.floor(Math.random() * categories.length)];
     let subcategory_id;
     try {
       // Retrieving according subcategories for the selected category
-      const subcategoryRes = await getSubcategories(category_id);
+      const subcategoryRes = await getSubcategories(randomCategory.id);
       subcategories = subcategoryRes.map((row) => ({
         id: row.subcategory_id,
         name: row.name,
@@ -142,14 +355,35 @@ async function generateProducts() {
       console.error("Error retrieving subcategories:", err);
     }
 
+    let properBrands;
+    let properMaterials;
+
+    if (randomCategory.type === "Shoes") {
+      properBrands = shoeBrands;
+      properMaterials = shoeMaterials;
+    } else {
+      properBrands = clothingBrands;
+      properMaterials = clothingMaterials;
+    }
+
     // Choosing random brand
-    const brand = faker.company.name();
-    // Choosing random name
-    const name = faker.commerce.productName();
+    const brand = properBrands[Math.floor(Math.random() * properBrands.length)];
+    // Choosing random name (adverb + adjective + category)
+    const randomAdverb = faker.word.adverb();
+    const randomAdjective = faker.word.adjective();
+    const name =
+      randomAdverb.charAt(0).toUpperCase() +
+      randomAdverb.slice(1) +
+      " " +
+      randomAdjective.charAt(0).toUpperCase() +
+      randomAdjective.slice(1) +
+      " " +
+      pluralToSingular(randomCategory.name);
     // Choosing random price
     const price = faker.commerce.price({ min: 50, max: 900, dec: 2 });
     // Choosing random material
-    const material = faker.commerce.productMaterial();
+    const material =
+      properMaterials[Math.floor(Math.random() * properMaterials.length)];
     // Choosing random description
     const description = faker.commerce.productDescription();
 
@@ -158,7 +392,7 @@ async function generateProducts() {
   db.end();
 }
 
-//generateProducts();
+generateProducts();
 
 async function populateInventory() {
   return new Promise((resolve, reject) => {
@@ -219,7 +453,7 @@ async function populateInventory() {
                       product.product_id,
                       color.color_id,
                       size.size_id,
-                      0, // Initial quantity
+                      Math.floor(Math.random() * 16),
                     ]);
                   });
                 });
@@ -270,7 +504,7 @@ async function generateInventoryQuantity() {
   db.end();
 }
 
-generateInventoryQuantity();
+// generateInventoryQuantity();
 
 // async function generateInventory() {
 //   try {

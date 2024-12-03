@@ -12,7 +12,12 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 
-const FilterList = ({ products, setProducts, originalProducts }) => {
+const FilterList = ({
+  products,
+  setProducts,
+  originalProducts,
+  setCurrentPage,
+}) => {
   const theme = createTheme({
     typography: {
       fontFamily:
@@ -53,7 +58,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
             .map((product) => product.material)
             .filter((material) => material)
         )
-      );
+      ).sort();
 
       const prices = products.map((product) => product.price);
       setMinPrice(Math.min(...prices));
@@ -64,7 +69,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
         new Set(
           products.map((product) => product.brand).filter((brand) => brand)
         )
-      );
+      ).sort();
 
       // Extract unique colors by checking if 'colors' exists
       const uniqueColors = Array.from(
@@ -162,7 +167,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
   };
 
   const filterProducts = () => {
-    let filteredProducts = products;
+    let filteredProducts = [...originalProducts];
 
     Object.keys(toggledData).forEach((key) => {
       const selectedValues = toggledData[key];
@@ -202,6 +207,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
     }
 
     setProducts(filteredProducts);
+    setCurrentPage(1);
   };
 
   const resetFilters = () => {
@@ -212,6 +218,7 @@ const FilterList = ({ products, setProducts, originalProducts }) => {
       size: [],
     });
     setProducts(originalProducts);
+    setCurrentPage(1);
   };
 
   const renderButtonStyle = (chosenFilter, item) => {
