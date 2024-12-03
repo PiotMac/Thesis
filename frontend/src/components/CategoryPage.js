@@ -12,6 +12,9 @@ const CategoryPage = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [imagePath, setImagePath] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9;
+
   const imageMap = {
     shoes: "/shoe.png",
     shirts: "/shirt.png",
@@ -53,6 +56,7 @@ const CategoryPage = () => {
 
         setProducts(productsData);
         setOriginalProducts(productsData);
+        setCurrentPage(1);
       } catch (error) {
         console.error("Error fetching subcategories:", error);
       }
@@ -68,6 +72,15 @@ const CategoryPage = () => {
     changeImage();
   }, [subcategory]);
 
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
   return (
     <div className="container_page">
       <div className="category_page_header_container">
@@ -82,7 +95,7 @@ const CategoryPage = () => {
         />
       </div>
       <div className="products_container">
-        {products.map((product, index) => (
+        {currentProducts.map((product, index) => (
           <ProductSquare
             key={index}
             product_id={product.product_id}
@@ -93,6 +106,19 @@ const CategoryPage = () => {
             description={product.description}
             imgSrc={imagePath}
           />
+        ))}
+      </div>
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            className={`page_button ${
+              currentPage === index + 1 ? "active-link" : ""
+            }`}
+            onClick={() => setCurrentPage(index + 1)}
+          >
+            {index + 1}
+          </button>
         ))}
       </div>
       <div className="subcategories_nav_container">
@@ -108,7 +134,7 @@ const CategoryPage = () => {
               >
                 <NavLink
                   to={`${mainCategory}/${subcategory}/${name}`}
-                  className={({ isActive }) => (isActive ? "active" : "")}
+                  className={({ isActive }) => (isActive ? "active-link" : "")}
                 >
                   {name.charAt(0).toUpperCase() + name.slice(1)}
                 </NavLink>
