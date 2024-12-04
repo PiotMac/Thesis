@@ -392,7 +392,7 @@ async function generateProducts() {
   db.end();
 }
 
-generateProducts();
+// generateProducts();
 
 async function populateInventory() {
   return new Promise((resolve, reject) => {
@@ -482,7 +482,7 @@ async function generateInventory() {
   db.end();
 }
 
-// generateInventory();
+generateInventory();
 
 async function createInventoryQuantity() {
   return new Promise((resolve, reject) => {

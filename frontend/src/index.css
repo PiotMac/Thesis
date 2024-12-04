@@ -1065,3 +1065,112 @@ footer {
   font-weight: bold;
   font-size: 200%;
 }
+
+.admin-dashboard {
+  text-align: center;
+  height: 100%;
+  background-color: var(--secondary-background-color);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 40px;
+}
+
+#admin-panel-header {
+  font-size: 300%;
+  color: gold;
+}
+
+.dashboard-card {
+  background: #f4f4f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+.dashboard-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.admin-products-analysis-container {
+  background-color: var(--primary-color);
+  height: 100%;
+  padding: 20px;
+}
+
+.admin-products-analysis-container h1 {
+  text-align: center;
+  font-size: 300%;
+  color: gold;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.admin-products-analysis-container > div:first-of-type {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+}
+
+.admin-products-analysis-container label {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #495057; /* Darker gray */
+  margin-right: 10px;
+}
+
+.admin-products-analysis-container input {
+  font-size: 1rem;
+  padding: 5px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  margin-right: 20px;
+  flex-grow: 1;
+}
+
+/* Charts Section */
+.admin-products-analysis-container h2 {
+  text-align: center;
+  font-size: 200%;
+  color: #343a40;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.admin-products-analysis-container .chart-container {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Make charts responsive */
+.chart-container canvas {
+  max-width: 100%;
+  height: auto;
+}

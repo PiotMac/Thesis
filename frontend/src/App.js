@@ -20,7 +20,8 @@ import ProductPage from "./components/ProductPage";
 import CartPage from "./components/CartPage";
 import CartPayPage from "./components/CartPayPage";
 import TransactionHistoryPage from "./components/TransactionHistoryPage";
-import AdminPage from "./components/AdminPage";
+import AdminDashboard from "./components/AdminDashboard";
+import AnalyzeProductsPage from "./components/AnalyzeProductsPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,14 +52,18 @@ function App() {
 
   function MainContent({ isLoggedIn, setIsLoggedIn }) {
     const location = useLocation();
-    const isAdminRoute = location.pathname === "/admin";
+    const isAdminRoute = location.pathname.startsWith("/admin");
 
     return (
       <div className="app">
         <div className="main_page">
           {isAdminRoute ? (
             <Routes>
-              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route
+                path="/admin/analyze-products"
+                element={<AnalyzeProductsPage setIsLoggedIn={setIsLoggedIn} />}
+              />
             </Routes>
           ) : (
             <>
