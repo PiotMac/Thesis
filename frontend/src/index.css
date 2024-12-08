@@ -1174,3 +1174,320 @@ footer {
   max-width: 100%;
   height: auto;
 }
+
+.flagged-deliveries-page, .delivery-insights-page {
+  background: var(--navbar-color);
+}
+
+/* Container Styles */
+.flagged-deliveries-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.flagged-deliveries-container h1 {
+  font-size: 2rem;
+  text-align: center;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+/* Notification Banner */
+.notification {
+  background-color: #ffcc00;
+  color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Table Styles */
+.flagged-deliveries-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.flagged-deliveries-table th,
+.flagged-deliveries-table td {
+  padding: 14px 16px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+}
+
+.flagged-deliveries-table th {
+  background-color: #f3f3f3;
+  color: #333;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.flagged-deliveries-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.flagged-deliveries-table tr:hover {
+  background-color: #f1f1f1;
+  transition: background-color 0.3s ease;
+}
+
+.flagged-deliveries-table td {
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+/* Highlight Row on Hover */
+.flagged-deliveries-table tr.selected {
+  background-color: #ffe4b5; /* Highlight selected row */
+}
+
+/* Button Styles */
+button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Accept Button */
+button.accept-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+button.accept-btn:hover {
+  background-color: #45a049;
+}
+
+/* Reject Button */
+button.reject-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+button.reject-btn:hover {
+  background-color: #e53935;
+}
+
+/* Disabled Button */
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .flagged-deliveries-container {
+    padding: 10px;
+  }
+
+  .flagged-deliveries-table th,
+  .flagged-deliveries-table td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .notification {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  button {
+    font-size: 0.75rem;
+    padding: 6px 8px;
+  }
+}
+
+.delivery-insights-container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Title Styling */
+.delivery-insights-container h1 {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+/* Section Styling */
+.pending-deliveries-section,
+.new-delivery-section {
+  margin-bottom: 40px;
+}
+
+.pending-deliveries-section h2,
+.new-delivery-section h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+.pending-deliveries-table td input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Table Styling */
+.pending-deliveries-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fdfdfd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pending-deliveries-table th,
+.pending-deliveries-table td {
+  padding: 14px 18px;
+  text-align: center;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.pending-deliveries-table th {
+  background-color: #f3f3f3;
+  color: #555;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.pending-deliveries-table tr {
+  transition: background 0.2s ease-in-out;
+}
+
+.pending-deliveries-table tr:hover {
+  background-color: #f7f7f7;
+}
+
+.pending-deliveries-table tr.selected {
+  background-color: #ffe4b5; /* Highlight selected rows */
+}
+
+/* Button Styling */
+button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Secondary Button (Optional) */
+button.secondary {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+button.secondary:hover {
+  background-color: #e8e8e8;
+}
+
+/* Form Styling */
+.new-delivery-section form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.new-delivery-section label {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.new-delivery-section input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border 0.2s ease;
+}
+
+.new-delivery-section input:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+.new-delivery-section button {
+  align-self: flex-start;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .delivery-insights-container {
+    padding: 15px;
+  }
+
+  .pending-deliveries-table {
+    font-size: 0.85rem;
+  }
+
+  .pending-deliveries-table th,
+  .pending-deliveries-table td {
+    padding: 10px;
+  }
+
+  .pending-deliveries-table {
+    overflow-x: auto;
+    display: block;
+  }
+
+  button {
+    font-size: 0.9rem;
+  }
+
+  .new-delivery-section label {
+    font-size: 0.85rem;
+  }
+}

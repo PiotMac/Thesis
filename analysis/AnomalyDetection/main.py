@@ -64,6 +64,7 @@ def get_price_per_unit(product_id: int, start_date: str, end_date: str):
         JOIN Inventory i ON d.inventory_id = i.id
         WHERE i.product_id = %s
         AND d.delivery_date BETWEEN %s AND %s
+        AND d.status = 'approved'
         GROUP BY d.delivery_date
         ORDER BY d.delivery_date;
     """
@@ -80,6 +81,7 @@ def get_average_quantity(product_id: int, start_date: str, end_date: str):
         JOIN Inventory i ON d.inventory_id = i.id
         WHERE i.product_id = %s
         AND d.delivery_date BETWEEN %s AND %s
+        AND d.status = 'approved'
         GROUP BY d.delivery_date
         ORDER BY d.delivery_date;
     """
@@ -133,6 +135,18 @@ def reject_delivery(delivery_id: int):
     cursor.close()
     connection.close()
     return {"message": f"Delivery {delivery_id} rejected successfully"}
+
+# Endpoint to receive all pending deliveries
+@app.get("/pending_deliveries")
+def get_pending_deliveries():
+    connection = get_db_connection()
+    query = """
+            SELECT * FROM Deliveries WHERE status = 'pending'
+            ORDER BY delivery_date
+        """
+    df = pd.read_sql(query, connection)
+    connection.close()
+    return df.to_dict(orient="records")
 
 
 @app.get("/kmeans_analysis")
