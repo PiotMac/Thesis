@@ -22,9 +22,12 @@ import CartPayPage from "./components/CartPayPage";
 import TransactionHistoryPage from "./components/TransactionHistoryPage";
 import AdminDashboard from "./components/AdminDashboard";
 import AnalyzeProductsPage from "./components/AnalyzeProductsPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+import FlaggedDeliveriesPage from "./components/FlaggedDeliveriesPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentRole, setCurrentRole] = useState("");
 
   useEffect(() => {
     const checkToken = () => {
@@ -34,9 +37,12 @@ function App() {
         const currentTime = Date.now() / 1000;
         if (payload.exp > currentTime) {
           setIsLoggedIn(true);
+          setCurrentRole(payload.role || "user");
         } else {
           localStorage.removeItem("token");
+          localStorage.removeItem("role");
           setIsLoggedIn(false);
+          setCurrentRole("");
         }
       }
     };
@@ -59,10 +65,29 @@ function App() {
         <div className="main_page">
           {isAdminRoute ? (
             <Routes>
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute role={currentRole}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin/analyze-products"
-                element={<AnalyzeProductsPage setIsLoggedIn={setIsLoggedIn} />}
+                element={
+                  <ProtectedRoute role={currentRole}>
+                    <AnalyzeProductsPage setIsLoggedIn={setIsLoggedIn} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/flagged-deliveries"
+                element={
+                  <ProtectedRoute role={currentRole}>
+                    <FlaggedDeliveriesPage />
+                  </ProtectedRoute>
+                }
               />
             </Routes>
           ) : (
@@ -119,69 +144,6 @@ function App() {
       </div>
     );
   }
-
-  // return (
-  //   <Router>
-  //     <div className="app">
-  //       <div className="main_page">
-  //         {shouldRenderAdminPanel ? (
-  //           <Routes>
-  //             <Route path="/admin" element={<AdminPage />} />
-  //           </Routes>
-  //         ) : (
-  //           <>
-  //             <header>
-  //               <Logo />
-  //               <Navbar isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
-  //             </header>
-  //             <div className="categories">
-  //               <Routes>
-  //                 <Route exact path="/" element={<Women />} />
-  //                 <Route exact path="/men" element={<Men />} />
-  //                 <Route exact path="/kids" element={<Kids />} />
-  //                 <Route
-  //                   path="/login"
-  //                   element={<Login setIsLoggedIn={setIsLoggedIn} />}
-  //                 />
-  //                 <Route
-  //                   path="/register"
-  //                   element={<Register setIsLoggedIn={setIsLoggedIn} />}
-  //                 />
-  //                 <Route
-  //                   path="/profile"
-  //                   element={<UserProfile setIsLoggedIn={setIsLoggedIn} />}
-  //                 />
-  //                 <Route
-  //                   path="/:mainCategory/:subcategory/:subsubcategory?"
-  //                   element={<CategoryPage />}
-  //                 />
-  //                 <Route
-  //                   path="/products/:product_id"
-  //                   element={<ProductPage />}
-  //                 />
-  //                 <Route
-  //                   path="/checkout"
-  //                   element={<CartPayPage setIsLoggedIn={setIsLoggedIn} />}
-  //                 />
-  //                 <Route
-  //                   path="/cart"
-  //                   element={<CartPage setIsLoggedIn={setIsLoggedIn} />}
-  //                 />
-  //                 <Route
-  //                   path="/transactions"
-  //                   element={
-  //                     <TransactionHistoryPage setIsLoggedIn={setIsLoggedIn} />
-  //                   }
-  //                 />
-  //               </Routes>
-  //             </div>
-  //             <Footer />
-  //           </>
-  //         )}
-  //       </div>
-  //     </div>
-  //   </Router>
-  // );
 }
 
 export default App;

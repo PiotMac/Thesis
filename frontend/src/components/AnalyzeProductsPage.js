@@ -13,7 +13,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { fontWeight } from "@mui/system";
 
 ChartJS.register(
   LineElement,
