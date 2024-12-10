@@ -281,18 +281,6 @@ def get_analysis(delivery_ids: List[int] = Query(...)):
 
     return JSONResponse(content=delivery_results)
 
-    # query = f"""
-    #         SELECT d.delivery_date, AVG(d.delivery_price / d.quantity) AS price_per_unit
-    #         FROM Deliveries d
-    #         JOIN Inventory i ON d.inventory_id = i.id
-    #         WHERE i.product_id = %s
-    #         AND d.delivery_date BETWEEN %s AND %s
-    #         AND d.status = 'approved'
-    #         GROUP BY d.delivery_date
-    #         ORDER BY d.delivery_date;
-    #     """
-    # df = pd.read_sql(query, connection, params=(product_id, start_date, end_date))
-
 
 # @app.get("/evaluate")
 # def get_evaluation(product_id: int, start_date: str, end_date: str):

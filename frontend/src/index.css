@@ -1120,6 +1120,10 @@ footer {
   background-color: var(--primary-color);
   height: 100%;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .admin-products-analysis-container h1 {
@@ -1140,6 +1144,7 @@ footer {
   background: #ffffff;
   border: 1px solid #ced4da;
   border-radius: 8px;
+  max-width: 80%;
 }
 
 .admin-products-analysis-container label {
@@ -1174,6 +1179,7 @@ footer {
   border: 1px solid #ced4da;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 80%;
 }
 
 /* Make charts responsive */
