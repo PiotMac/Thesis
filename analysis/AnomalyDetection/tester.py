@@ -6,18 +6,19 @@ import os
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
+import seaborn as sns
 
-load_dotenv()
-
-# Connect to the database
-connection = mysql.connector.connect(
-    host=os.getenv("DB_HOST"),
-    port=os.getenv("DB_PORT"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME"),
-)
-cursor = connection.cursor()
+# load_dotenv()
+#
+# # Connect to the database
+# connection = mysql.connector.connect(
+#     host=os.getenv("DB_HOST"),
+#     port=os.getenv("DB_PORT"),
+#     user=os.getenv("DB_USER"),
+#     password=os.getenv("DB_PASSWORD"),
+#     database=os.getenv("DB_NAME"),
+# )
+# cursor = connection.cursor()
 
 # Query for average price per unit by date
 # product_id = 758  # Replace with the desired product_id
@@ -206,3 +207,141 @@ cursor = connection.cursor()
 # connection.commit()
 # cursor.close()
 # connection.close()
+
+
+# Wykres słupkowy dla metryki
+def plot_metric_comparison(results_df, metric, save_path):
+    plt.figure(figsize=(14, 8))
+    sns.barplot(
+        data=results_df,
+        x="Distribution",
+        y=metric,
+        hue="Algorithm",
+        errorbar=None
+    )
+    if metric == "Time":
+        plt.yscale('log')
+        plt.ylabel("Time (log scale)", fontsize=14)
+    else:
+        plt.ylabel(metric, fontsize=14)
+    plt.title(f"{metric} by Algorithm and Distribution", fontsize=16)
+    plt.xlabel("Distribution", fontsize=14)
+    plt.legend(title="Algorithm", fontsize=12)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig(save_path)
+
+
+def plot_single_metric_heatmap_by_distribution(results_df, metric, save_path):
+    # Grupowanie wyników według algorytmu i rozkładu danych
+    summary = results_df.groupby(["Algorithm", "Distribution"])[metric].mean().unstack()
+
+    # Tworzenie heatmapy
+    plt.figure(figsize=(16, 8))
+    sns.heatmap(
+        summary,
+        annot=True,
+        fmt=".3f",
+        cmap="coolwarm",
+        cbar=True,
+        linewidths=0.5,
+        linecolor="gray"
+    )
+    plt.title(f"Average {metric} of Algorithms by Data Type", fontsize=16)
+    plt.xlabel("Data Type", fontsize=14)
+    plt.ylabel("Algorithm", fontsize=14)
+    plt.tight_layout()
+    plt.savefig(save_path)
+
+
+def plot_algorithm_performance_heatmap(results_df, save_path):
+    # Obliczanie średnich metryk dla każdego algorytmu
+    summary = results_df.groupby("Algorithm")[["Precision", "Recall", "F1 Score"]].mean()
+
+    # Tworzenie heatmapy
+    plt.figure(figsize=(12, 6))
+    sns.heatmap(
+        summary,
+        annot=True,
+        fmt=".3f",
+        cmap="viridis",
+        cbar=True
+    )
+    plt.title("Average Performance of Algorithms", fontsize=16)
+    plt.tight_layout()
+    plt.savefig(save_path)
+    # Grupowanie wyników według algorytmu i rozkładu danych
+    # summary = results_df.groupby(["Algorithm", "Distribution"])[
+    #     ["Accuracy", "Precision", "Recall", "F1 Score"]
+    # ].mean().unstack()
+    #
+    # # Tworzenie heatmapy
+    # plt.figure(figsize=(16, 8))
+    # sns.heatmap(
+    #     summary,
+    #     annot=True,
+    #     fmt=".3f",
+    #     cmap="viridis",
+    #     cbar=True,
+    #     linewidths=0.5,
+    #     linecolor="gray"
+    # )
+    # plt.title("Average Performance of Algorithms by Data Type", fontsize=16)
+    # plt.xlabel("Data Type", fontsize=14)
+    # plt.ylabel("Algorithm", fontsize=14)
+    # plt.savefig(save_path)
+    # plt.show()
+
+
+def plot_metric_by_samples(results_df, metric, save_path):
+    plt.figure(figsize=(14, 8))
+
+    sns.lineplot(
+        data=results_df,
+        x="n_samples",
+        y=metric,
+        hue="Algorithm",
+        linewidth=3,
+        errorbar=None
+    )
+    # sns.lineplot(
+    #     data=results_df,
+    #     x="n_samples",
+    #     y=metric,
+    #     hue="Algorithm",
+    #     style="Distribution",
+    #     markers=True,
+    #     dashes=False
+    # )
+    if metric == "Time":
+        plt.yscale('log')
+        plt.ylabel("Time (log scale)", fontsize=14)
+    else:
+        plt.ylabel(metric, fontsize=14)
+
+    plt.title(f"{metric} by Sample Size and Algorithm", fontsize=16)
+    plt.xlabel("Number of Samples", fontsize=14)
+    plt.legend(title="Algorithm", fontsize=12)
+    plt.grid(axis='both', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig(save_path)
+
+
+# Ścieżka do pliku CSV
+file_path = "comparison/anomaly_detection_results.csv"
+
+# Wczytanie danych
+results_df = pd.read_csv(file_path)
+print(results_df.head())
+
+# Generowanie wykresów dla każdej metryki
+metrics = ["Precision", "Recall", "F1 Score", "Time"]
+distributions = results_df["Distribution"].unique()
+n_samples_unique = results_df["n_samples"].unique()
+algorithms = results_df["Algorithm"].unique()
+
+plot_algorithm_performance_heatmap(results_df, "comparison/all/algorithm_performance_heatmap.png")
+
+for metric in metrics:
+    plot_metric_comparison(results_df, metric, f"comparison/all/{metric}_comparison.png")
+    plot_metric_by_samples(results_df, metric, f"comparison/all/{metric}_by_samples.png")

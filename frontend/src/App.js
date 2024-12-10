@@ -25,6 +25,7 @@ import AnalyzeProductsPage from "./components/AnalyzeProductsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FlaggedDeliveriesPage from "./components/FlaggedDeliveriesPage";
 import DeliveryInsightsPage from "./components/DeliveryInsightsPage";
+import InventoryManagementPage from "./components/InventoryManagementPage";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -87,6 +88,14 @@ function App() {
                 element={
                   <ProtectedRoute role={currentRole}>
                     <FlaggedDeliveriesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/inventory"
+                element={
+                  <ProtectedRoute role={currentRole}>
+                    <InventoryManagementPage />
                   </ProtectedRoute>
                 }
               />

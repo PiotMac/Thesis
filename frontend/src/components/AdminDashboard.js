@@ -17,7 +17,6 @@ const AdminDashboard = () => {
       route: "/admin/delivery-insights",
       icon: "📈",
     },
-    { label: "User Management", route: "/admin/user-management", icon: "👤" },
   ];
 
   return (

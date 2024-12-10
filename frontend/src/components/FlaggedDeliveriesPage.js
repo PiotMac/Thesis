@@ -111,11 +111,10 @@ const FlaggedDeliveriesPage = () => {
   const handleAccept = async (deliveryId) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/approve_delivery/?delivery_id=${deliveryId}`,
+        `http://localhost:8000/approve_delivery?delivery_id=${deliveryId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ delivery_id: deliveryId, status: "approved" }),
         }
       );
       if (response.ok) {
@@ -133,11 +132,10 @@ const FlaggedDeliveriesPage = () => {
   const handleReject = async (deliveryId) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/reject_delivery/?delivery_id=${deliveryId}`,
+        `http://localhost:8000/reject_delivery?delivery_id=${deliveryId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ delivery_id: deliveryId, status: "rejected" }),
         }
       );
       if (response.ok) {
@@ -188,9 +186,9 @@ const FlaggedDeliveriesPage = () => {
             <tr>
               <th>Delivery ID</th>
               <th>Inventory ID</th>
+              <th>Product ID</th>
               <th>Quantity</th>
               <th>Delivery Price</th>
-              <th>Anomaly Score</th>
               <th>Delivery Date</th>
               <th>Actions</th>
             </tr>
@@ -200,9 +198,9 @@ const FlaggedDeliveriesPage = () => {
               <tr key={delivery.delivery_id}>
                 <td>{delivery.delivery_id}</td>
                 <td>{delivery.inventory_id}</td>
+                <td>{delivery.product_id}</td>
                 <td>{delivery.quantity}</td>
                 <td>{delivery.delivery_price}</td>
-                <td>{delivery.anomaly_score}</td>
                 <td>{delivery.delivery_date}</td>
                 <td>
                   <button

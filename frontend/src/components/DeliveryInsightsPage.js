@@ -25,12 +25,15 @@ const DeliveryInsightsPage = () => {
 
   // Create a new delivery
   const createNewDelivery = async () => {
+    const queryParams = new URLSearchParams(newDelivery).toString();
     try {
-      const response = await fetch("http://localhost:8000/create_delivery", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newDelivery),
-      });
+      const response = await fetch(
+        `http://localhost:8000/create_delivery?${queryParams}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       if (response.ok) {
         alert("New delivery created successfully!");
         setNewDelivery({
@@ -50,14 +53,30 @@ const DeliveryInsightsPage = () => {
 
   // Submit selected deliveries for analysis
   const submitForAnalysis = async () => {
+    console.log(selectedDeliveries);
+    const queryString = selectedDeliveries
+      .map((id) => `delivery_ids=${id}`)
+      .join("&");
+    console.log(queryString);
+
     try {
-      const response = await fetch("http://localhost:8000/analyze_deliveries", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ delivery_ids: selectedDeliveries }),
-      });
+      const response = await fetch(
+        `http://localhost:8000/analyze_deliveries?${queryString}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          // body: JSON.stringify({ delivery_ids: selectedDeliveries }),
+        }
+      );
       if (response.ok) {
-        alert("Selected deliveries sent for analysis!");
+        const results = await response.json();
+        const anomalyCount = results.filter(
+          (result) => result.result === -1
+        ).length;
+        const totalDeliveries = results.length;
+        alert(
+          `${anomalyCount} out of ${totalDeliveries} deliveries were classified as anomalies.`
+        );
         fetchPendingDeliveries(); // Refresh pending deliveries
         setSelectedDeliveries([]); // Clear selections
       } else {
@@ -113,6 +132,7 @@ const DeliveryInsightsPage = () => {
               <tr>
                 <th>Delivery ID</th>
                 <th>Inventory ID</th>
+                <th>Product ID</th>
                 <th>Quantity</th>
                 <th>Delivery Price</th>
                 <th>Delivery Date</th>
@@ -133,6 +153,7 @@ const DeliveryInsightsPage = () => {
                 >
                   <td>{delivery.delivery_id}</td>
                   <td>{delivery.inventory_id}</td>
+                  <td>{delivery.product_id}</td>
                   <td>{delivery.quantity}</td>
                   <td>{delivery.delivery_price}</td>
                   <td>{delivery.delivery_date}</td>
