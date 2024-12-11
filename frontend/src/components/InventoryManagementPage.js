@@ -1,10 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-const InventoryManagementPage = () => {
+const InventoryManagementPage = ({ setIsLoggedIn }) => {
   const [productId, setProductId] = useState("");
   const [inventory, setInventory] = useState([]);
+  const navigate = useNavigate();
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return false;
+    }
+  };
 
   const fetchInventory = async () => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     if (!productId) return;
     try {
       const response = await fetch(

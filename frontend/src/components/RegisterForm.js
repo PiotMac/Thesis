@@ -29,18 +29,6 @@ const RegisterForm = ({ setIsLoggedIn }) => {
     });
   };
 
-  //   const checkRepeatedPassword = (e) => {
-  //     if (!Object.values(criteria).every(Boolean)) {
-  //         setErrorMessage("Criteria have to be met!");
-  //         return;
-  //     }
-  //     if (!password !== repeatPassword) {
-  //       setErrorMessage("Passwords must be the same!");
-  //       return;
-  //     }
-  //     setErrorMessage("");
-  //   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 

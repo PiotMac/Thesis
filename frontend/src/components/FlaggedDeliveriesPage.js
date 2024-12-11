@@ -1,102 +1,31 @@
-// import React, { useState, useEffect } from "react";
-
-// const FlaggedDeliveriesPage = () => {
-//   const [flaggedDeliveries, setFlaggedDeliveries] = useState([]);
-
-//   // Fetch flagged deliveries
-//   useEffect(() => {
-//     const fetchFlaggedDeliveries = async () => {
-//       try {
-//         const response = await fetch(
-//           "http://localhost:8000/flagged_deliveries"
-//         );
-//         const data = await response.json();
-//         setFlaggedDeliveries(data);
-//       } catch (error) {
-//         console.error("Error fetching flagged deliveries:", error);
-//       }
-//     };
-
-//     fetchFlaggedDeliveries();
-//   }, []);
-
-//   // Approve a delivery
-//   const approveDelivery = async (deliveryId) => {
-//     try {
-//       await fetch(`http://localhost:8000/approve_delivery/${deliveryId}`, {
-//         method: "POST",
-//       });
-//       setFlaggedDeliveries((prev) =>
-//         prev.filter((delivery) => delivery.delivery_id !== deliveryId)
-//       );
-//     } catch (error) {
-//       console.error("Error approving delivery:", error);
-//     }
-//   };
-
-//   // Reject a delivery
-//   const rejectDelivery = async (deliveryId) => {
-//     try {
-//       await fetch(`http://localhost:8000/reject_delivery/${deliveryId}`, {
-//         method: "POST",
-//       });
-//       setFlaggedDeliveries((prev) =>
-//         prev.filter((delivery) => delivery.delivery_id !== deliveryId)
-//       );
-//     } catch (error) {
-//       console.error("Error rejecting delivery:", error);
-//     }
-//   };
-
-//   return (
-//     <div className="flagged-deliveries">
-//       <h1>Flagged Deliveries</h1>
-//       <table>
-//         <thead>
-//           <tr>
-//             <th>Delivery ID</th>
-//             <th>Product Name</th>
-//             <th>Quantity</th>
-//             <th>Price</th>
-//             <th>Delivery Date</th>
-//             <th>Status</th>
-//             <th>Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {flaggedDeliveries.map((delivery) => (
-//             <tr key={delivery.delivery_id}>
-//               <td>{delivery.delivery_id}</td>
-//               <td>{delivery.product_name}</td>
-//               <td>{delivery.quantity}</td>
-//               <td>${delivery.delivery_price.toFixed(2)}</td>
-//               <td>{new Date(delivery.delivery_date).toLocaleDateString()}</td>
-//               <td>{delivery.status}</td>
-//               <td>
-//                 <button onClick={() => approveDelivery(delivery.delivery_id)}>
-//                   Approve
-//                 </button>
-//                 <button onClick={() => rejectDelivery(delivery.delivery_id)}>
-//                   Reject
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
-
-// export default FlaggedDeliveriesPage;
-
 import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-const FlaggedDeliveriesPage = () => {
+const FlaggedDeliveriesPage = ({ setIsLoggedIn }) => {
   const [flaggedDeliveries, setFlaggedDeliveries] = useState([]);
   const [notification, setNotification] = useState(null);
+  const navigate = useNavigate();
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return false;
+    }
+  };
 
   const fetchFlaggedDeliveries = async () => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     try {
       const response = await fetch("http://localhost:8000/flagged-deliveries");
       const data = await response.json();
@@ -109,6 +38,12 @@ const FlaggedDeliveriesPage = () => {
 
   // Handle Accept
   const handleAccept = async (deliveryId) => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:8000/approve_delivery?delivery_id=${deliveryId}`,
@@ -130,6 +65,12 @@ const FlaggedDeliveriesPage = () => {
 
   // Handle Reject
   const handleReject = async (deliveryId) => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     try {
       const response = await fetch(
         `http://localhost:8000/reject_delivery?delivery_id=${deliveryId}`,
@@ -149,32 +90,8 @@ const FlaggedDeliveriesPage = () => {
     }
   };
 
-  // const listenForNotifications = () => {
-  //   // WebSocket example
-  //   const ws = new WebSocket("ws://localhost:6000/notifications");
-
-  //   ws.onmessage = (event) => {
-  //     const message = JSON.parse(event.data);
-  //     if (
-  //       message.type === "status_change" &&
-  //       message.new_status === "flagged"
-  //     ) {
-  //       setNotification(`Delivery ID ${message.delivery_id} flagged!`);
-  //       fetchFlaggedDeliveries(); // Refresh flagged deliveries
-  //     }
-  //   };
-
-  //   ws.onerror = (error) => {
-  //     console.error("WebSocket error:", error);
-  //   };
-
-  //   return () => ws.close();
-  // };
-
   useEffect(() => {
     fetchFlaggedDeliveries();
-    // const unsubscribe = listenForNotifications();
-    // return unsubscribe; // Cleanup WebSocket on unmount
   }, []);
 
   return (

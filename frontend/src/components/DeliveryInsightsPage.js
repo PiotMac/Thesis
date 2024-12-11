@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
-const DeliveryInsightsPage = () => {
+const DeliveryInsightsPage = ({ setIsLoggedIn }) => {
   const [pendingDeliveries, setPendingDeliveries] = useState([]);
   const [selectedDeliveries, setSelectedDeliveries] = useState([]);
   const [dragging, setDragging] = useState(false);
@@ -12,8 +14,28 @@ const DeliveryInsightsPage = () => {
     delivery_date: "",
   });
 
+  const navigate = useNavigate();
+
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      return decoded.exp > currentTime;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return false;
+    }
+  };
+
   // Fetch pending deliveries
   const fetchPendingDeliveries = async () => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     try {
       const response = await fetch("http://localhost:8000/pending_deliveries");
       const data = await response.json();
@@ -25,6 +47,12 @@ const DeliveryInsightsPage = () => {
 
   // Create a new delivery
   const createNewDelivery = async () => {
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     const queryParams = new URLSearchParams(newDelivery).toString();
     try {
       const response = await fetch(
@@ -53,7 +81,12 @@ const DeliveryInsightsPage = () => {
 
   // Submit selected deliveries for analysis
   const submitForAnalysis = async () => {
-    console.log(selectedDeliveries);
+    const token = localStorage.getItem("token");
+    if (!isTokenValid(token)) {
+      setIsLoggedIn(false);
+      navigate("/login");
+      return;
+    }
     const queryString = selectedDeliveries
       .map((id) => `delivery_ids=${id}`)
       .join("&");

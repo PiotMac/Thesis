@@ -90,7 +90,6 @@ const AnalyzeProductsPage = ({ setIsLoggedIn }) => {
         borderColor: "orange",
         backgroundColor: "orange",
         borderWidth: 3,
-        // fill: false,
         pointRadius: 2,
       },
       {
@@ -123,7 +122,7 @@ const AnalyzeProductsPage = ({ setIsLoggedIn }) => {
   const options = (label) => ({
     plugins: {
       tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)", // Dark tooltip
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
       },
       legend: {
         labels: {
@@ -134,7 +133,7 @@ const AnalyzeProductsPage = ({ setIsLoggedIn }) => {
               text: dataset.label,
               strokeStyle:
                 dataset.label === `${label} Trendline`
-                  ? "red" // Manually set the legend color for the trendline
+                  ? "red"
                   : dataset.borderColor,
               lineWidth:
                 dataset.label === `${label} Trendline`
@@ -151,24 +150,24 @@ const AnalyzeProductsPage = ({ setIsLoggedIn }) => {
     scales: {
       x: {
         ticks: {
-          color: "black", // Black X-axis labels
-          maxTicksLimit: 10, // Show only 10 ticks
+          color: "black",
+          maxTicksLimit: 10,
         },
         grid: {
-          color: "rgba(0, 0, 0, 0.3)", // Light gridlines
+          color: "rgba(0, 0, 0, 0.3)",
         },
       },
       y: {
         ticks: {
-          color: "black", // Black Y-axis labels
+          color: "black",
           font: {
-            size: 16, // Font size
-            weight: "bold", // Font weight
-            family: "Arial", // Font family
+            size: 16,
+            weight: "bold",
+            family: "Arial",
           },
         },
         grid: {
-          color: "rgba(0, 0, 0, 0.3)", // Light gridlines
+          color: "rgba(0, 0, 0, 0.3)",
         },
       },
     },

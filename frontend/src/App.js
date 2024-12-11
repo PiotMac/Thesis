@@ -87,7 +87,7 @@ function App() {
                 path="/admin/flagged-deliveries"
                 element={
                   <ProtectedRoute role={currentRole}>
-                    <FlaggedDeliveriesPage />
+                    <FlaggedDeliveriesPage setIsLoggedIn={setIsLoggedIn} />
                   </ProtectedRoute>
                 }
               />
@@ -95,7 +95,7 @@ function App() {
                 path="/admin/inventory"
                 element={
                   <ProtectedRoute role={currentRole}>
-                    <InventoryManagementPage />
+                    <InventoryManagementPage setIsLoggedIn={setIsLoggedIn} />
                   </ProtectedRoute>
                 }
               />
@@ -103,7 +103,7 @@ function App() {
                 path="/admin/delivery-insights"
                 element={
                   <ProtectedRoute role={currentRole}>
-                    <DeliveryInsightsPage />
+                    <DeliveryInsightsPage setIsLoggedIn={setIsLoggedIn} />
                   </ProtectedRoute>
                 }
               />

@@ -231,7 +231,7 @@ def get_analysis(delivery_ids: List[int] = Query(...)):
                     FROM Deliveries d
                     JOIN Inventory i ON d.inventory_id = i.id
                     WHERE i.product_id = %s
-                    AND d.status = 'approved'
+                    -- AND d.status = 'approved'
                     ORDER BY d.delivery_date;
                 """
 
@@ -247,7 +247,7 @@ def get_analysis(delivery_ids: List[int] = Query(...)):
             JOIN Inventory i ON d.inventory_id = i.id
             WHERE i.product_id = %s
             AND d.delivery_date BETWEEN %s AND %s
-            AND d.status = 'approved'
+            -- AND d.status = 'approved'
             -- GROUP BY d.delivery_date
             ORDER BY d.delivery_date;
         """
@@ -282,24 +282,24 @@ def get_analysis(delivery_ids: List[int] = Query(...)):
     return JSONResponse(content=delivery_results)
 
 
-# @app.get("/evaluate")
-# def get_evaluation(product_id: int, start_date: str, end_date: str):
-#     connection = get_db_connection()
-#     query = f"""
-#             SELECT d.delivery_date, d.delivery_price / d.quantity AS price_per_unit,
-#                     d.quantity AS avg_quantity
-#             FROM Deliveries d
-#             JOIN Inventory i ON d.inventory_id = i.id
-#             WHERE i.product_id = %s
-#             AND d.delivery_date BETWEEN %s AND %s
-#             AND d.status = 'approved'
-#             -- GROUP BY d.delivery_date
-#             ORDER BY d.delivery_date;
-#         """
-#     df = pd.read_sql(query, connection, params=(product_id, start_date, end_date))
-#     evaluate_algorithms_on_product_data(product_id, start_date, end_date, df)
-#     connection.close()
-#     # return df.to_dict(orient="records")
+@app.get("/evaluate")
+def get_evaluation(product_id: int, start_date: str, end_date: str):
+    connection = get_db_connection()
+    query = f"""
+            SELECT d.delivery_date, d.delivery_price / d.quantity AS price_per_unit,
+                    d.quantity AS avg_quantity
+            FROM Deliveries d
+            JOIN Inventory i ON d.inventory_id = i.id
+            WHERE i.product_id = %s
+            AND d.delivery_date BETWEEN %s AND %s
+            -- AND d.status = 'approved'
+            -- GROUP BY d.delivery_date
+            ORDER BY d.delivery_date;
+        """
+    df = pd.read_sql(query, connection, params=(product_id, start_date, end_date))
+    evaluate_algorithms_on_product_data(product_id, start_date, end_date, df)
+    connection.close()
+    return df.to_dict(orient="records")
 #
 #
 # @app.get("/kmeans_analysis")
