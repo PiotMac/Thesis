@@ -14,8 +14,6 @@ The project includes a script, `run.sh`, which sets up and runs the entire appli
 2. **Backend**: Runs on port `4000`.
 3. **Anomaly Detection Logic**: Runs on port `8000`.
 
-Use command './run.sh to start the programs.
-
 ## Folder Structure
 
 ### `frontend/`
@@ -26,3 +24,19 @@ This folder contains the backend server implemented with Node.js and Express. It
 
 ### `analysis/`
 This folder contains the logic for anomaly detection, implemented with Python and FastAPI. It also handles Deliveries-related requests, integrating them with the anomaly detection functionality.
+
+## How to run the project:
+
+Ensure you have the necessary dependencies installed for each folder:
+- Navigate to folders `frontend`, `server` and run in each:
+     ```
+     npm install
+     ```
+- Navigate to folder 'analysis/AnomalyDetection' and run these commands:
+     ```
+     python3 -m venv .venv
+     source .venv/bin/activate
+     pip install -r requirements.txt
+     ```
+     
+After doing so, run a bash script `./run.sh`.
